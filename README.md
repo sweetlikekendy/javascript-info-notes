@@ -8,8 +8,13 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [Objects](#objects)
     - [Object references and copying](#object-references-and-copying)
     - [Garbage Collection](#garbage-collection)
+    - [Object methods, this](#object-methods-this)
+    - [Constructor, operator "new"](#constructor-operator-new)
+    - [Optional chaining '?.'](#optional-chaining-)
+      - [Summary](#summary)
+    - [Symbol Type](#symbol-type)
 
-## Objects
+## [Objects](https://javascript.info/object-basics)
 
 ### [Object references and copying](https://javascript.info/object-copy)
 
@@ -57,3 +62,55 @@ Garbage collected
 ![Garbage collected example](4-objects/images/garbage-collection/garbage-collected-example.png)
 
 - Being referenced is not the same as being reachable (from a root): a pack of interlinked objects can become unreachable as a whole.
+
+### [Object methods, this](https://javascript.info/object-methods)
+
+- A method that calls `this` will allow access to the properties of the object in which the method is called
+
+- Arrow functions have no `this`
+
+### [Constructor, operator "new"](https://javascript.info/constructor-new)
+
+```js
+function User(name) {
+  this.name = name
+  this.isAdmin = false
+}
+
+let user = new User("Jack")
+
+alert(user.name) // Jack
+alert(user.isAdmin) // false
+
+// essentially the constructor does this
+function User(name) {
+  // this = {};  (implicitly)
+
+  // add properties to this
+  this.name = name
+  this.isAdmin = false
+
+  // return this;  (implicitly)
+}
+```
+
+- Usually, constructors do not have a return statement. Their task is to write all necessary stuff into this, and it automatically becomes the result.
+- If return is called with an object, then the object is returned instead of this.
+- If return is called with a primitive, it’s ignored.
+
+### [Optional chaining '?.'](https://javascript.info/optional-chaining)
+
+- Example with `value?.prop`
+  - works as `value.prop`, if `value` exists,
+  - otherwise (when `value` is undefined/null) it returns `undefined`.
+- `user?.address.street.name` the `?.` allows `user` to safely be `null/undefined` (and returns `undefined` in that case), but that’s only for `user`
+
+#### Summary
+
+The optional chaining `?.` syntax has three forms:
+
+- `obj?.prop `– returns `obj.prop` if `obj` exists, otherwise `undefined`.
+- `obj?.[prop]` – returns `obj[prop]` if `obj` exists, otherwise `undefined`.
+- `obj.method?.()` – calls `obj.method()` if `obj.method` exists, otherwise returns `undefined`.
+
+### [Symbol Type](https://javascript.info/symbol)
