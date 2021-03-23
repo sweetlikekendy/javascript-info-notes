@@ -5,45 +5,65 @@ My notes from the [javascript.info](https://javascript.info) website.
 **Table of Contents**
 
 - [Javascript.info Notes](#javascriptinfo-notes)
-  - [Objects](#objects)
-    - [Object references and copying](#object-references-and-copying)
-    - [Garbage Collection](#garbage-collection)
-    - [Object methods, this](#object-methods-this)
-    - [Constructor, operator "new"](#constructor-operator-new)
-    - [Optional chaining '?.'](#optional-chaining-)
-      - [**Summary**](#summary)
-    - [Symbol Type](#symbol-type)
-    - [Object to primitive conversion](#object-to-primitive-conversion)
-      - [**ToPrimitive**](#toprimitive)
-  - [Data types](#data-types)
-    - [Primative Methods](#primative-methods)
-    - [Numbers](#numbers)
-      - [**toString(base)**](#tostringbase)
-      - [**Rounding**](#rounding)
-      - [**Imprecise Calculations**](#imprecise-calculations)
-      - [**parseInt and parseFloat**](#parseint-and-parsefloat)
-      - [**Other math functions**](#other-math-functions)
-    - [Strings](#strings)
-      - [**Special Characters**](#special-characters)
-      - [**Accessing characters**](#accessing-characters)
-      - [**Strings are immutable**](#strings-are-immutable)
-      - [**Searching for a substring**](#searching-for-a-substring)
-      - [**The bitwise NOT trick**](#the-bitwise-not-trick)
-      - [**includes, startsWith, endsWith**](#includes-startswith-endswith)
-      - [**Getting a substring**](#getting-a-substring)
-      - [**Comparing strings**](#comparing-strings)
-      - [**Summary**](#summary-1)
+- [**Objects**](#objects)
+  - [**Object references and copying**](#object-references-and-copying)
+  - [**Garbage Collection**](#garbage-collection)
+  - [**Object methods, this**](#object-methods-this)
+  - [**Constructor, operator "new"**](#constructor-operator-new)
+  - [**Optional chaining '?.'**](#optional-chaining-)
+  - [**Summary**](#summary)
+  - [**Symbol Type**](#symbol-type)
+  - [**Object to primitive conversion**](#object-to-primitive-conversion)
+  - [**ToPrimitive**](#toprimitive)
+- [**Data types**](#data-types)
+  - [**Primative Methods**](#primative-methods)
+  - [**Numbers**](#numbers)
+  - [**toString(base)**](#tostringbase)
+  - [**Rounding**](#rounding)
+  - [**Imprecise Calculations**](#imprecise-calculations)
+  - [**parseInt and parseFloat**](#parseint-and-parsefloat)
+  - [**Other math functions**](#other-math-functions)
+  - [**Strings**](#strings)
+  - [**Special Characters**](#special-characters)
+  - [**Accessing characters**](#accessing-characters)
+  - [**Strings are immutable**](#strings-are-immutable)
+  - [**Searching for a substring**](#searching-for-a-substring)
+  - [**The bitwise NOT trick**](#the-bitwise-not-trick)
+  - [**Searching in array**](#searching-in-array)
+    - [**includes, startsWith, endsWith**](#includes-startswith-endswith)
+    - [**Getting a substring**](#getting-a-substring)
+  - [**Comparing strings**](#comparing-strings)
+  - [**Summary**](#summary-1)
+  - [**Arrays**](#arrays)
+  - [**A word about "length"**](#a-word-about-length)
+  - [**Array methods**](#array-methods)
+  - [**splice**](#splice)
+  - [**slice**](#slice)
+  - [**concat**](#concat)
+  - [**forEach**](#foreach)
+  - [**Searching in array**](#searching-in-array-1)
+    - [**indexOf/lastIndexOf and includes**](#indexoflastindexof-and-includes)
+    - [**find and findIndex**](#find-and-findindex)
+    - [**filter**](#filter)
+  - [**Transform an array**](#transform-an-array)
+    - [**map**](#map)
+    - [**sort(fn)**](#sortfn)
+    - [**reverse**](#reverse)
+    - [**split** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**](#split-and-join)
+    - [**reduce**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**](#reducereduceright)
+    - [**Array.isArray(value)**](#arrayisarrayvalue)
+    - [**Most methods support "thisArg"**](#most-methods-support-thisarg)
 
-## [Objects](https://javascript.info/object-basics)
+# **[Objects](https://javascript.info/object-basics)**
 
-### [Object references and copying](https://javascript.info/object-copy)
+## **[Object references and copying](https://javascript.info/object-copy)**
 
 - Objects are assigned and copied by reference
   ![Object reference example](4-objects/images/references/example.png)
 - Object.assign for the so-called “shallow copy”
 - Nested objs have to be deeply cloned. Use [`_.cloneDeep(obj)`](https://lodash.com/docs/4.17.15#cloneDeep) from [lodash](https://lodash.com/docs/) lib
 
-### [Garbage Collection](https://javascript.info/garbage-collection)
+## **[Garbage Collection](https://javascript.info/garbage-collection)**
 
 - Garbage collection is performed automatically. We cannot force or prevent it.
 
@@ -83,13 +103,13 @@ Garbage collected
 
 - Being referenced is not the same as being reachable (from a root): a pack of interlinked objects can become unreachable as a whole.
 
-### [Object methods, this](https://javascript.info/object-methods)
+## **[Object methods, this](https://javascript.info/object-methods)**
 
 - A method that calls `this` will allow access to the properties of the object in which the method is called
 
 - Arrow functions have no `this`
 
-### [Constructor, operator "new"](https://javascript.info/constructor-new)
+## **[Constructor, operator "new"](https://javascript.info/constructor-new)**
 
 ```js
 function User(name) {
@@ -118,14 +138,14 @@ function User(name) {
 - If return is called with an object, then the object is returned instead of this.
 - If return is called with a primitive, it’s ignored.
 
-### [Optional chaining '?.'](https://javascript.info/optional-chaining)
+## **[Optional chaining '?.'](https://javascript.info/optional-chaining)**
 
 - Example with `value?.prop`
   - works as `value.prop`, if `value` exists,
   - otherwise (when `value` is undefined/null) it returns `undefined`.
 - `user?.address.street.name` the `?.` allows `user` to safely be `null/undefined` (and returns `undefined` in that case), but that’s only for `user`
 
-#### **Summary**
+## **Summary**
 
 The optional chaining `?.` syntax has three forms:
 
@@ -133,7 +153,7 @@ The optional chaining `?.` syntax has three forms:
 - `obj?.[prop]` – returns `obj[prop]` if `obj` exists, otherwise `undefined`.
 - `obj.method?.()` – calls `obj.method()` if `obj.method` exists, otherwise returns `undefined`.
 
-### [Symbol Type](https://javascript.info/symbol)
+## **[Symbol Type](https://javascript.info/symbol)**
 
 - `Symbol` is a primitive type for unique identifiers.
 
@@ -147,9 +167,9 @@ The optional chaining `?.` syntax has three forms:
 
   2. So we can “covertly” hide something into objects that we need, but others should not see, using symbolic properties. There are many system symbols used by JavaScript which are accessible as `Symbol.\*`. We can use them to alter some built-in behaviors. For instance, later in the tutorial we’ll use `Symbol.iterator` for iterables, `Symbol.toPrimitive` to setup object-to-primitive conversion and so on.
 
-### [Object to primitive conversion](https://javascript.info/object-toprimitive)
+## **[Object to primitive conversion](https://javascript.info/object-toprimitive)**
 
-#### **ToPrimitive**
+## **ToPrimitive**
 
 - `string` object-to-string conversion
 - `number` obejct-to-number conversion
@@ -161,17 +181,17 @@ The optional chaining `?.` syntax has three forms:
   2. Otherwise if hint is `"string"` try `obj.toString()` and `obj.valueOf()`, whatever exists.
   3. Otherwise if hint is "number" or "default" try `obj.valueOf()` and `obj.toString()`, whatever exists.
 
-## [Data types](https://javascript.info/data-types)
+# **[Data types](https://javascript.info/data-types)**
 
-### [Primative Methods](https://javascript.info/primitives-methods)
+## **[Primative Methods](https://javascript.info/primitives-methods)**
 
 - 7 types of primatives: `string`, `number`, `bigint`, `boolean`, `symbol`, `null`, and `undefined`
 
-### [Numbers](https://javascript.info/number)
+## **[Numbers](https://javascript.info/number)**
 
 - Regular JavaScript numbers are stored in 64-bit format, aka "double precision floating point number"
 
-#### **toString(base)**
+## **toString(base)**
 
 - base=16 is used for hex colors, character encodings etc, digits can be 0..9 or A..F
 - base=2 mostly for debugging bitwise operations, digits can be 0 or 1
@@ -182,7 +202,7 @@ The optional chaining `?.` syntax has three forms:
 alert((12345).toString(36)) // 2n9c
 ```
 
-#### **Rounding**
+## **Rounding**
 
 - `Math.floor`
 - `Math.ceil`
@@ -196,7 +216,7 @@ alert((12345).toString(36)) // 2n9c
 | -1.1   | -2         | -1        | -1         | -1         |
 | -1.6   | -2         | -1        | -2         | -1         |
 
-#### **Imprecise Calculations**
+## **Imprecise Calculations**
 
 ```js
 alert(0.1 + 0.2 == 0.3) // false
@@ -207,7 +227,7 @@ let sum = 0.1 + 0.2
 alert(sum.toFixed(2)) // 0.30
 ```
 
-#### **parseInt and parseFloat**
+## **parseInt and parseFloat**
 
 ```js
 alert(+"100px") // NaN
@@ -221,13 +241,13 @@ alert(parseFloat("12.3.4")) // 12.3, the second point stops the reading
 alert(parseInt("a123")) // NaN, the first symbol stops the process
 ```
 
-#### **Other math functions**
+## **Other math functions**
 
 - `Math.random()`, `Math.max(a, b, c, ...)`, `Math.pow(n, power)`
 
-### [Strings](https://javascript.info/string)
+## **[Strings](https://javascript.info/string)**
 
-#### **Special Characters**
+## **Special Characters**
 
 | Character        | Description                                                                                                                                                                            |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -241,7 +261,7 @@ alert(parseInt("a123")) // NaN, the first symbol stops the process
 | `\uXXXX`         | A Unicode symbol with the hex code `XXXX` in UTF-16 encoding, for instance `\u00A9` – is a Unicode for the copyright symbol ©. It must be exactly 4 hex digits.                        |
 | `\u{X…XXXXXX}`   | (1 to 6 hex characters) A Unicode symbol with the given UTF-32 encoding. Some rare characters are encoded with two Unicode symbols, taking 4 bytes. This way we can insert long codes. |
 
-#### **Accessing characters**
+## **Accessing characters**
 
 ```js
 let str = `Hello`
@@ -262,7 +282,7 @@ for (let char of "Hello") {
 }
 ```
 
-#### **Strings are immutable**
+## **Strings are immutable**
 
 ```js
 let str = "Hi"
@@ -271,7 +291,7 @@ str[0] = "h" // error
 alert(str[0]) // doesn't wor
 ```
 
-#### **Searching for a substring**
+## **Searching for a substring**
 
 `str.indexOf(substr, pos)` [.indexOf mdn link](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf)
 
@@ -300,7 +320,7 @@ if (str.indexOf("Widget") != -1) {
 }
 ```
 
-#### **The bitwise NOT trick**
+## **The bitwise NOT trick**
 
 - Converts the number to a 32-bit integer (removes the decimal part if exists) and then reverses all bits in its binary representation
 
@@ -320,7 +340,9 @@ if (~str.indexOf("Widget")) {
 }
 ```
 
-#### **includes, startsWith, endsWith**
+## **Searching in array**
+
+### **includes, startsWith, endsWith**
 
 - `str.includes(substr, pos)` returns true/false depending on whether `str` contains `substr`
 - `str.startsWith` & `str.endsWith`
@@ -330,7 +352,7 @@ alert("Widget".startsWith("Wid")) // true, "Widget" starts with "Wid"
 alert("Widget".endsWith("get")) // true, "Widget" ends with "get"
 ```
 
-#### **Getting a substring**
+### **Getting a substring**
 
 3 methods: `substring`, `substr` and `slice`
 
@@ -370,7 +392,7 @@ alert(str.substr(2, 4)) // 'ring', from the 2nd position get 4 characters
 alert(str.substr(-4, 2)) // 'gi', from the 4th position get 2 characters
 ```
 
-#### **Comparing strings**
+## **Comparing strings**
 
 - Lowercase > Uppercase
 - Letters w/ diacriticial marks are "out of order"
@@ -385,10 +407,252 @@ alert("Österreich" > "Zealand") // true
   - positive number if str is greater than str2.
   - 0 if they are equivalent.
 
-#### **Summary**
+## **Summary**
 
 There are several other helpful methods in strings:
 
 - `str.trim()` – removes (“trims”) spaces from the beginning and end of the string.
 - `str.repeat(n)` – repeats the string n times.
 - …and more to be found in the [manual](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+
+## **[Arrays](https://javascript.info/array)**
+
+![Push/pop fast, Shift/unshift slow](5-data_types/images/arrays/push_pop_shift_unshift.png)
+
+- `push(...items)` adds `items` to the end.
+- `pop()` removes the element from the end and returns it.
+- `shift()` removes the element from the beginning and returns it.
+- `unshift(...items)` adds `items` to the beginning.
+- loops an array without index `for (let item of arr)`
+
+## **A word about "length"**
+
+```js
+let arr = [1, 2, 3, 4, 5]
+
+arr.length = 2 // truncate to 2 elements
+alert(arr) // [1, 2]
+
+arr.length = 5 // return length back
+alert(arr[3]) // undefined: the values do not return
+
+arr.length = 0 // simple way to clear an array
+```
+
+## **[Array methods](https://javascript.info/array-methods)**
+
+## **[splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)**
+
+`arr.splice(start[, deleteCount, elem1, ..., elemN])` returns elements removed
+
+```js
+// REMOVE AND REPLACE ==============================================
+
+let arr = ["I", "study", "JavaScript", "right", "now"]
+
+// remove 3 first elements and replace them with another
+arr.splice(0, 3, "Let's", "dance")
+
+alert(arr) // now ["Let's", "dance", "right", "now"]
+
+// DELETE AND RETURN ===============================================
+
+let arr = ["I", "study", "JavaScript", "right", "now"]
+
+// remove 2 first elements
+let removed = arr1.splice(0, 2)
+
+alert(removed) // "I", "study" <-- array of removed elements
+
+// INSERTING =======================================================
+let arr = ["I", "study", "JavaScript"]
+
+// from index 2
+// delete 0
+// then insert "complex" and "language"
+arr.splice(2, 0, "complex", "language")
+
+alert(arr) // "I", "study", "complex", "language", "JavaScript"
+
+// NEGATIVE INDEX ALLOWED ==========================================
+
+let arr = [1, 2, 5]
+
+// from index -1 (one step from the end)
+// delete 0 elements,
+// then insert 3 and 4
+arr.splice(-1, 0, 3, 4)
+
+alert(arr) // 1,2,3,4,5
+```
+
+## **[slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)**
+
+`arr.slice([start], [end])` returns a new array copying to it all items from index `start` to `end` (not including `end`). Both `start` and `end` can be negative, in that case position from array end is assumed.
+
+```js
+let arr = ["t", "e", "s", "t"]
+
+alert(arr.slice(1, 3)) // e,s (copy from 1 to 3)
+
+alert(arr.slice(-2)) // s,t (copy from -2 till the end)
+```
+
+## **[concat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)**
+
+`arr.concat(arg1, arg2...)` returns a new array that includes values from other arrays and additional items.
+
+If `argN` is an array, all elements are copied. Otherwise, the argument itself is copied.
+
+## **[forEach](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/foreach)**
+
+```js
+arr.forEach(function (item, index, array) {
+  // ... do something with item
+})
+```
+
+Allows to run a function for every element of the array.
+
+## **Searching in array**
+
+### **indexOf/lastIndexOf and includes**
+
+```js
+let arr = [1, 0, false]
+
+alert(arr.indexOf(0)) // 1
+alert(arr.indexOf(false)) // 2
+alert(arr.indexOf(null)) // -1
+
+alert(arr.includes(1)) // true
+
+// Includes handles NaN ===========================================
+const arr = [NaN]
+
+alert(arr.indexOf(NaN)) // -1 (should be 0, but === equality doesn't work for NaN)
+alert(arr.includes(NaN)) // true (correct)
+```
+
+### **[find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find) and findIndex**
+
+```js
+let result = arr.find(function (item, index, array) {
+  // if true is returned, item is returned and iteration is stopped
+  // for falsy scenario returns undefined
+})
+```
+
+```js
+// Mainly used for an array of objects
+let users = [
+  { id: 1, name: "John" },
+  { id: 2, name: "Pete" },
+  { id: 3, name: "Mary" },
+]
+
+let user = users.find((item) => item.id == 1)
+
+alert(user.name) // John
+```
+
+- `arr.findIndex` returns the index where the element was found instead of the element. Returns `-1` if nothing is found
+
+### **[filter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)**
+
+Used if there are more than one instance in an array. Returns an array of all matching elements
+
+```js
+let results = arr.filter(function (item, index, array) {
+  // if true item is pushed to results and the iteration continues
+  // returns empty array if nothing found
+})
+```
+
+```js
+let users = [
+  { id: 1, name: "John" },
+  { id: 2, name: "Pete" },
+  { id: 3, name: "Mary" },
+]
+
+// returns array of the first two users
+let someUsers = users.filter((item) => item.id < 3)
+
+alert(someUsers.length) // 2
+```
+
+## **Transform an array**
+
+### **[map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)**
+
+```js
+let result = arr.map(function (item, index, array) {
+  // returns the new value instead of item
+})
+```
+
+### **[sort(fn)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)**
+
+All elements are converted to strings during compare.
+
+```js
+let arr = [1, 2, 15]
+
+// to sort numbers
+arr.sort((a, b) => a - b) // 1, 2, 15
+
+let countries = ["Österreich", "Andorra", "Vietnam"]
+
+alert(countries.sort((a, b) => a.localeCompare(b))) // Andorra,Österreich,Vietnam (correct!)
+```
+
+### **[reverse](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)**
+
+### **[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
+
+```js
+// Split example
+let names = "Bilbo, Gandalf, Nazgul"
+
+let arr = names.split(", ")
+
+for (let name of arr) {
+  alert(`A message to ${name}.`) // A message to Bilbo  (and other names)
+}
+
+//  split with length arg
+let arr = "Bilbo, Gandalf, Nazgul, Saruman".split(", ", 2)
+
+alert(arr) // Bilbo, Gandalf
+```
+
+```js
+// Join example
+let arr = ["Bilbo", "Gandalf", "Nazgul"]
+
+let str = arr.join(";") // glue the array into a string using ;
+
+alert(str) // Bilbo;Gandalf;Nazgul
+```
+
+### **[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
+
+Used to calculate a single value based on the array.
+
+```js
+let value = arr.reduce(
+  function (accumulator, item, index, array) {
+    // ...
+  },
+  [initial]
+)
+```
+
+### **[Array.isArray(value)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/isArray)**
+
+To check if array or not. Returns `true` or `false`.
+
+### **Most methods support "thisArg"**
+
+The value of `thisArg` parameter becomes `this` for `func`.
