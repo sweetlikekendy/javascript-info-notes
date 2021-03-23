@@ -11,23 +11,28 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [Object methods, this](#object-methods-this)
     - [Constructor, operator "new"](#constructor-operator-new)
     - [Optional chaining '?.'](#optional-chaining-)
-      - [Summary](#summary)
+      - [**Summary**](#summary)
     - [Symbol Type](#symbol-type)
     - [Object to primitive conversion](#object-to-primitive-conversion)
-      - [ToPrimitive](#toprimitive)
+      - [**ToPrimitive**](#toprimitive)
   - [Data types](#data-types)
     - [Primative Methods](#primative-methods)
     - [Numbers](#numbers)
-      - [toString(base)](#tostringbase)
-      - [Rounding](#rounding)
-      - [Imprecise Calculations](#imprecise-calculations)
-      - [parseInt and parseFloat](#parseint-and-parsefloat)
-      - [Other math functions](#other-math-functions)
+      - [**toString(base)**](#tostringbase)
+      - [**Rounding**](#rounding)
+      - [**Imprecise Calculations**](#imprecise-calculations)
+      - [**parseInt and parseFloat**](#parseint-and-parsefloat)
+      - [**Other math functions**](#other-math-functions)
     - [Strings](#strings)
-      - [Special Characters](#special-characters)
-      - [Accessing characters](#accessing-characters)
-      - [Strings are immutable](#strings-are-immutable)
-      - [Searching for a substring](#searching-for-a-substring)
+      - [**Special Characters**](#special-characters)
+      - [**Accessing characters**](#accessing-characters)
+      - [**Strings are immutable**](#strings-are-immutable)
+      - [**Searching for a substring**](#searching-for-a-substring)
+      - [**The bitwise NOT trick**](#the-bitwise-not-trick)
+      - [**includes, startsWith, endsWith**](#includes-startswith-endswith)
+      - [**Getting a substring**](#getting-a-substring)
+      - [**Comparing strings**](#comparing-strings)
+      - [**Summary**](#summary-1)
 
 ## [Objects](https://javascript.info/object-basics)
 
@@ -120,7 +125,7 @@ function User(name) {
   - otherwise (when `value` is undefined/null) it returns `undefined`.
 - `user?.address.street.name` the `?.` allows `user` to safely be `null/undefined` (and returns `undefined` in that case), but that’s only for `user`
 
-#### Summary
+#### **Summary**
 
 The optional chaining `?.` syntax has three forms:
 
@@ -144,7 +149,7 @@ The optional chaining `?.` syntax has three forms:
 
 ### [Object to primitive conversion](https://javascript.info/object-toprimitive)
 
-#### ToPrimitive
+#### **ToPrimitive**
 
 - `string` object-to-string conversion
 - `number` obejct-to-number conversion
@@ -166,7 +171,7 @@ The optional chaining `?.` syntax has three forms:
 
 - Regular JavaScript numbers are stored in 64-bit format, aka "double precision floating point number"
 
-#### toString(base)
+#### **toString(base)**
 
 - base=16 is used for hex colors, character encodings etc, digits can be 0..9 or A..F
 - base=2 mostly for debugging bitwise operations, digits can be 0 or 1
@@ -177,7 +182,7 @@ The optional chaining `?.` syntax has three forms:
 alert((12345).toString(36)) // 2n9c
 ```
 
-#### Rounding
+#### **Rounding**
 
 - `Math.floor`
 - `Math.ceil`
@@ -191,7 +196,7 @@ alert((12345).toString(36)) // 2n9c
 | -1.1   | -2         | -1        | -1         | -1         |
 | -1.6   | -2         | -1        | -2         | -1         |
 
-#### Imprecise Calculations
+#### **Imprecise Calculations**
 
 ```js
 alert(0.1 + 0.2 == 0.3) // false
@@ -202,7 +207,7 @@ let sum = 0.1 + 0.2
 alert(sum.toFixed(2)) // 0.30
 ```
 
-#### parseInt and parseFloat
+#### **parseInt and parseFloat**
 
 ```js
 alert(+"100px") // NaN
@@ -216,13 +221,13 @@ alert(parseFloat("12.3.4")) // 12.3, the second point stops the reading
 alert(parseInt("a123")) // NaN, the first symbol stops the process
 ```
 
-#### Other math functions
+#### **Other math functions**
 
 - `Math.random()`, `Math.max(a, b, c, ...)`, `Math.pow(n, power)`
 
 ### [Strings](https://javascript.info/string)
 
-#### Special Characters
+#### **Special Characters**
 
 | Character        | Description                                                                                                                                                                            |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -236,7 +241,7 @@ alert(parseInt("a123")) // NaN, the first symbol stops the process
 | `\uXXXX`         | A Unicode symbol with the hex code `XXXX` in UTF-16 encoding, for instance `\u00A9` – is a Unicode for the copyright symbol ©. It must be exactly 4 hex digits.                        |
 | `\u{X…XXXXXX}`   | (1 to 6 hex characters) A Unicode symbol with the given UTF-32 encoding. Some rare characters are encoded with two Unicode symbols, taking 4 bytes. This way we can insert long codes. |
 
-#### Accessing characters
+#### **Accessing characters**
 
 ```js
 let str = `Hello`
@@ -257,7 +262,7 @@ for (let char of "Hello") {
 }
 ```
 
-#### Strings are immutable
+#### **Strings are immutable**
 
 ```js
 let str = "Hi"
@@ -266,9 +271,15 @@ str[0] = "h" // error
 alert(str[0]) // doesn't wor
 ```
 
-#### Searching for a substring
+#### **Searching for a substring**
 
 `str.indexOf(substr, pos)` [.indexOf mdn link](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf)
+
+- beginning to end
+
+`str.lastIndexOf(substr, position)`
+
+- end to beginning
 
 ```js
 let str = "Widget with id"
@@ -278,5 +289,106 @@ alert(str.indexOf("widget")) // -1, not found, the search is case-sensitive
 
 alert(str.indexOf("id")) // 1, "id" is found at the position 1 (..idget with id)
 
-alert(str.indexOf("id", 2)) // 12
+alert(str.indexOf("id", 2)) // 12 w'id'get with 'id'
+
+if (str.indexOf("Widget")) {
+  alert("We found it") // doesn't work!
+}
+
+if (str.indexOf("Widget") != -1) {
+  alert("We found it") // works now!
+}
 ```
+
+#### **The bitwise NOT trick**
+
+- Converts the number to a 32-bit integer (removes the decimal part if exists) and then reverses all bits in its binary representation
+
+```js
+alert(~2) // -3, the same as -(2+1)
+alert(~1) // -2, the same as -(1+1)
+alert(~0) // -1, the same as -(0+1)
+alert(~-1) // 0, the same as -(-1+1)
+```
+
+```js
+let str = "Widget"
+
+// if (~str.indexOf(...)) reads as “if found”
+if (~str.indexOf("Widget")) {
+  alert("Found it!") // works
+}
+```
+
+#### **includes, startsWith, endsWith**
+
+- `str.includes(substr, pos)` returns true/false depending on whether `str` contains `substr`
+- `str.startsWith` & `str.endsWith`
+
+```js
+alert("Widget".startsWith("Wid")) // true, "Widget" starts with "Wid"
+alert("Widget".endsWith("get")) // true, "Widget" ends with "get"
+```
+
+#### **Getting a substring**
+
+3 methods: `substring`, `substr` and `slice`
+
+- `str.slice(start [, end])` returns the part of the string from `start` to (but not including) `end`. **it is enough to just remember this one**
+
+```js
+let str = "stringify"
+alert(str.slice(0, 5)) // 'strin', the substring from 0 to 5 (not including 5)
+alert(str.slice(0, 1)) // 's', from 0 to 1, but not including 1, so only character at 0
+
+// without first arg
+alert(str.slice(2)) // 'ringify', from the 2nd position till the end
+
+// start at the 4th position from the right, end at the 1st from the right
+alert(str.slice(-4, -1)) // 'gif'
+```
+
+- `str.substring(start [,end])` 4eturns the part of the string between `start` and `end`. _negative args are not supported_
+
+```js
+let str = "stringify"
+
+// these are same for substring
+alert(str.substring(2, 6)) // "ring"
+alert(str.substring(6, 2)) // "ring"
+
+// ...but not for slice:
+alert(str.slice(2, 6)) // "ring" (the same)
+alert(str.slice(6, 2)) // "" (an empty string)
+```
+
+- `str.substr(start, [,length])` returns the part of the string from `start`, with the given `length`
+
+```js
+let str = "stringify"
+alert(str.substr(2, 4)) // 'ring', from the 2nd position get 4 characters
+alert(str.substr(-4, 2)) // 'gi', from the 4th position get 2 characters
+```
+
+#### **Comparing strings**
+
+- Lowercase > Uppercase
+- Letters w/ diacriticial marks are "out of order"
+
+```js
+alert("Österreich" > "Zealand") // true
+```
+
+- `str.localeCompare(str2[, locales[, options]] )` [mdn link](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare) returns an integer indicating whether str is less, equal or greater than str2 according to the language rules:
+
+  - negative number if str is less than str2.
+  - positive number if str is greater than str2.
+  - 0 if they are equivalent.
+
+#### **Summary**
+
+There are several other helpful methods in strings:
+
+- `str.trim()` – removes (“trims”) spaces from the beginning and end of the string.
+- `str.repeat(n)` – repeats the string n times.
+- …and more to be found in the [manual](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
