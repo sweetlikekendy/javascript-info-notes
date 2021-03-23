@@ -15,6 +15,19 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [Symbol Type](#symbol-type)
     - [Object to primitive conversion](#object-to-primitive-conversion)
       - [ToPrimitive](#toprimitive)
+  - [Data types](#data-types)
+    - [Primative Methods](#primative-methods)
+    - [Numbers](#numbers)
+      - [toString(base)](#tostringbase)
+      - [Rounding](#rounding)
+      - [Imprecise Calculations](#imprecise-calculations)
+      - [parseInt and parseFloat](#parseint-and-parsefloat)
+      - [Other math functions](#other-math-functions)
+    - [Strings](#strings)
+      - [Special Characters](#special-characters)
+      - [Accessing characters](#accessing-characters)
+      - [Strings are immutable](#strings-are-immutable)
+      - [Searching for a substring](#searching-for-a-substring)
 
 ## [Objects](https://javascript.info/object-basics)
 
@@ -142,3 +155,128 @@ The optional chaining `?.` syntax has three forms:
   1. Call obj `[Symbol.toPrimitive](hint)` if the method exists,
   2. Otherwise if hint is `"string"` try `obj.toString()` and `obj.valueOf()`, whatever exists.
   3. Otherwise if hint is "number" or "default" try `obj.valueOf()` and `obj.toString()`, whatever exists.
+
+## [Data types](https://javascript.info/data-types)
+
+### [Primative Methods](https://javascript.info/primitives-methods)
+
+- 7 types of primatives: `string`, `number`, `bigint`, `boolean`, `symbol`, `null`, and `undefined`
+
+### [Numbers](https://javascript.info/number)
+
+- Regular JavaScript numbers are stored in 64-bit format, aka "double precision floating point number"
+
+#### toString(base)
+
+- base=16 is used for hex colors, character encodings etc, digits can be 0..9 or A..F
+- base=2 mostly for debugging bitwise operations, digits can be 0 or 1
+- base=36 the whole latin alphabet is ued to represent a number.
+  - use case: turn a long numeric identifier into something short. Ex: make a short url
+
+```js
+alert((12345).toString(36)) // 2n9c
+```
+
+#### Rounding
+
+- `Math.floor`
+- `Math.ceil`
+- `Math.round`
+- `Math.trunc`
+
+| Number | Math.floor | Math.ceil | Math.round | Math.trunc |
+| ------ | ---------- | --------- | ---------- | ---------- |
+| 3.1    | 3          | 4         | 3          | 3          |
+| 3.6    | 3          | 4         | 4          | 3          |
+| -1.1   | -2         | -1        | -1         | -1         |
+| -1.6   | -2         | -1        | -2         | -1         |
+
+#### Imprecise Calculations
+
+```js
+alert(0.1 + 0.2 == 0.3) // false
+alert(0.1 + 0.2) // 0.30000000000000004
+
+// fix
+let sum = 0.1 + 0.2
+alert(sum.toFixed(2)) // 0.30
+```
+
+#### parseInt and parseFloat
+
+```js
+alert(+"100px") // NaN
+
+alert(parseInt("100px")) // 100
+alert(parseFloat("12.5em")) // 12.5
+
+alert(parseInt("12.3")) // 12, only the integer part is returned
+alert(parseFloat("12.3.4")) // 12.3, the second point stops the reading
+
+alert(parseInt("a123")) // NaN, the first symbol stops the process
+```
+
+#### Other math functions
+
+- `Math.random()`, `Math.max(a, b, c, ...)`, `Math.pow(n, power)`
+
+### [Strings](https://javascript.info/string)
+
+#### Special Characters
+
+| Character        | Description                                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `\n`             | New line                                                                                                                                                                               |
+| `\r`             | Carriage return: not used alone. Windows text files use a combination of two characters `\r\n` to represent a line break.                                                              |
+| `\'`, `\"`       | Quotes                                                                                                                                                                                 |
+| `\\`             | Backslash                                                                                                                                                                              |
+| `\t`             | Tab                                                                                                                                                                                    |
+| `\b`, `\f`, `\v` | Backspace, Form Feed, Vertical Tab – kept for compatibility, not used nowadays.                                                                                                        |
+| `\xXX`           | Unicode character with the given hexadecimal Unicode `XX`, e.g. `'\x7A'` is the same as 'z'.                                                                                           |
+| `\uXXXX`         | A Unicode symbol with the hex code `XXXX` in UTF-16 encoding, for instance `\u00A9` – is a Unicode for the copyright symbol ©. It must be exactly 4 hex digits.                        |
+| `\u{X…XXXXXX}`   | (1 to 6 hex characters) A Unicode symbol with the given UTF-32 encoding. Some rare characters are encoded with two Unicode symbols, taking 4 bytes. This way we can insert long codes. |
+
+#### Accessing characters
+
+```js
+let str = `Hello`
+
+// the first character
+alert(str[0]) // H
+alert(str.charAt(0)) // H
+
+// the last character
+alert(str[str.length - 1]) // o
+
+alert(str[1000]) // undefined
+alert(str.charAt(1000)) // '' (an empty string)
+
+// iterate over string
+for (let char of "Hello") {
+  alert(char) // H,e,l,l,o (char becomes "H", then "e", then "l" etc)
+}
+```
+
+#### Strings are immutable
+
+```js
+let str = "Hi"
+
+str[0] = "h" // error
+alert(str[0]) // doesn't wor
+```
+
+#### Searching for a substring
+
+`str.indexOf(substr, pos)` [.indexOf mdn link](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf)
+
+```js
+let str = "Widget with id"
+
+alert(str.indexOf("Widget")) // 0, because 'Widget' is found at the beginning
+alert(str.indexOf("widget")) // -1, not found, the search is case-sensitive
+
+alert(str.indexOf("id")) // 1, "id" is found at the position 1 (..idget with id)
+
+alert(str.indexOf("id", 2)) // 12
+```
