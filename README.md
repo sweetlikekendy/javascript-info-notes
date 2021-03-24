@@ -56,6 +56,18 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**Iterables**](#iterables)
     - [**Array-likes**](#array-likes)
     - [**Array.from**](#arrayfrom)
+  - [**Map and Set**](#map-and-set)
+    - [**Map**](#map-1)
+      - [**How Map compares keys**](#how-map-compares-keys)
+      - [**Chaining**](#chaining)
+    - [**Iteration over Map**](#iteration-over-map)
+    - [**Object.entries: Map from Object**](#objectentries-map-from-object)
+    - [**Object.fromEntries: Object from Map**](#objectfromentries-object-from-map)
+    - [**Set**](#set)
+  - [**WeakMap and WeakSet**](#weakmap-and-weakset)
+    - [**Use case: caching**](#use-case-caching)
+  - [**Object.keys, values, entries**](#objectkeys-values-entries)
+    - [**Transforming objects**](#transforming-objects)
 
 # **[Objects](https://javascript.info/object-basics)**
 
@@ -212,12 +224,12 @@ alert((12345).toString(36)) // 2n9c
 - `Math.round`
 - `Math.trunc`
 
-| Number | Math.floor | Math.ceil | Math.round | Math.trunc |
-| ------ | ---------- | --------- | ---------- | ---------- |
-| 3.1    | 3          | 4         | 3          | 3          |
-| 3.6    | 3          | 4         | 4          | 3          |
-| -1.1   | -2         | -1        | -1         | -1         |
-| -1.6   | -2         | -1        | -2         | -1         |
+|      | Math.floor | Math.ceil | Math.round | Math.trunc |
+| ---- | ---------- | --------- | ---------- | ---------- |
+| 3.1  | 3          | 4         | 3          | 3          |
+| 3.6  | 3          | 4         | 4          | 3          |
+| -1.1 | -2         | -1        | -1         | -1         |
+| -1.6 | -2         | -1        | -2         | -1         |
 
 ## **Imprecise Calculations**
 
@@ -713,3 +725,190 @@ Takes an iterable or array-like value and makes a "real" `Array` from it.
 `mapFn` can be a function that will be applied to each element before adding it to the array.
 
 `thisArg` allows us to set `this`
+
+## **[Map and Set](https://javascript.info/map-set)**
+
+### **[Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)**
+
+Like an object, but `Map` allows keys of any type
+
+Methods and properties are:
+
+- `new Map()` – creates the map.
+- `map.set(key, value)` – stores the value by the key.
+- `map.get(key)` – returns the value by the key, undefined if key doesn’t exist in map.
+- `map.has(key)` – returns true if the key exists, false otherwise.
+- `map.delete(key)` – removes the value by the key.
+- `map.clear()` – removes everything from the map.
+- `map.size` – returns the current element count.
+
+Unlike objects, keys are not converted to strings. Any type of key is possible.
+
+**Map can also use objects as keys.**
+
+#### **How Map compares keys**
+
+To test keys for equivalence, Map uses the algorithm [SameValueZero](https://tc39.es/ecma262/#sec-samevaluezero). It is roughly the same as strict equality `===`, but the difference is that NaN is considered equal to NaN. So NaN can be used as the key as well.
+
+This algorithm can’t be changed or customized.
+
+#### **Chaining**
+
+Every`map.set` call returns the map itself, so we can chain calls.
+
+```js
+map.set("1", "str1").set(1, "num1").set(true, "bool1")
+```
+
+### **Iteration over Map**
+
+3 methods:
+
+- `map.keys()` – returns an iterable for keys,
+- `map.values()` – returns an iterable for values,
+- `map.entries()` – returns an iterable for entries `[key, value]`, it’s used by default in `for..of`.
+
+Map also has builtin `forEach` method
+
+```js
+// runs the function for each (key, value) pair
+recipeMap.forEach((value, key, map) => {
+  alert(`${key}: ${value}`) // cucumber: 500 etc
+})
+```
+
+### **Object.entries: Map from Object**
+
+We can use `Object.entries(obj)` to create a map on existing object.
+
+```js
+let obj = {
+  name: "John",
+  age: 30,
+}
+
+let map = new Map(Object.entries(obj))
+
+alert(map.get("name")) // John
+```
+
+### **Object.fromEntries: Object from Map**
+
+`Object.fromEntries` given an array of [key, value] pairs, it creates an object from them.
+
+We can use `Object.fromEntries` to get a plain object from `Map`
+.
+
+```js
+let map = new Map()
+map.set("banana", 1)
+map.set("orange", 2)
+map.set("meat", 4)
+
+// A call to map.entries() returns an iterable of key/value pairs, exactly in the right format for Object.fromEntries.
+let obj = Object.fromEntries(map.entries()) // make a plain object (*)
+
+// You can omit .entries() because Object.fromEntries expects an iterable object as the arg
+let obj = Object.fromEntries(map) // omit .entries()
+
+// done!
+// obj = { banana: 1, orange: 2, meat: 4 }
+
+alert(obj.orange) // 2
+```
+
+### **Set**
+
+Methods and properties:
+
+- `new Set([iterable])` – creates the set, with optional `iterable` (e.g. array) of values for initialization.
+- `set.add(value)` – adds a value (does nothing if `value` exists), returns the set itself.
+- ` set.delete(value)` – removes the value, returns `true` if `value` existed at the moment of the call, otherwise `false`.
+- `set.has(value)` – returns `true` if the value exists in the set, otherwise `false`.
+- `set.clear()` – removes everything from the set.
+- `set.size` – is the elements count.
+
+**Iteration over Map and Set is always in the insertion order, so we can’t say that these collections are unordered, but we can’t reorder elements or directly get an element by its number.**
+
+## **[WeakMap and WeakSet](https://javascript.info/weakmap-weakset)**
+
+### **Use case: caching**
+
+```js
+// 📁 cache.js
+let cache = new Map()
+
+// calculate and remember the result
+function process(obj) {
+  if (!cache.has(obj)) {
+    let result = /* calculations of the result for */ obj
+
+    cache.set(obj, result)
+  }
+
+  return cache.get(obj)
+}
+
+// Now we use process() in another file:
+
+// 📁 main.js
+let obj = {
+  /* let's say we have an object */
+}
+
+let result1 = process(obj) // calculated
+
+// ...later, from another place of the code...
+let result2 = process(obj) // remembered result taken from cache
+
+// ...later, when the object is not needed any more:
+obj = null
+
+alert(cache.size) // 1 (Ouch! The object is still in cache, taking memory!)
+```
+
+**Summary**
+
+`WeakMap` is `Map`-like collection that allows only objects as keys and removes them together with associated value once they become inaccessible by other means.
+
+`WeakSet` is `Set`-like collection that stores only objects and removes them once they become inaccessible by other means.
+
+Their main advantages are that they have weak reference to objects, so they can easily be removed by garbage collector.
+
+That comes at the cost of not having support for `clear`, `size`, `keys`, `values`...
+
+`WeakMap` and `WeakSet` are used as “secondary” data structures in addition to the “primary” object storage. Once the object is removed from the primary storage, if it is only found as the key of `WeakMap` or in a `WeakSet`, it will be cleaned up automatically.
+
+## **[Object.keys, values, entries](https://javascript.info/keys-values-entries)**
+
+Following methods are available:
+
+- `Object.keys(obj)` – returns an array of keys.
+- `Object.values(obj)` – returns an array of values.
+- `Object.entries(obj)` – returns an array of `[key, value]` pairs.
+
+|             | Map          | Object                                 |
+| ----------- | ------------ | -------------------------------------- |
+| Call syntax | `map.keys()` | `Object.keys(obj)`, but not obj.keys() |
+| Returns     | iterable     | “real” Array                           |
+
+### **Transforming objects**
+
+1. Use `Object.entries(obj)` to get an array of key/value pairs from `obj`.
+2. Use array methods on that array, e.g. map.
+3. Use `Object.fromEntries(array)` on the resulting array to turn it back into an object.
+
+```js
+let prices = {
+  banana: 1,
+  orange: 2,
+  meat: 4,
+}
+
+let doublePrices = Object.fromEntries(
+  // convert to array, map, and then fromEntries gives back the object
+  Object.entries(prices).map(([key, value]) => [key, value * 2])
+)
+
+alert(doublePrices.meat) // 8
+```
