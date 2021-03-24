@@ -49,10 +49,13 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**map**](#map)
     - [**sort(fn)**](#sortfn)
     - [**reverse**](#reverse)
-    - [**split** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**](#split-and-join)
-    - [**reduce**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**](#reducereduceright)
+    - [**split** and **join**](#split-and-join)
+    - [**reduce**/**reduceRight**](#reducereduceright)
     - [**Array.isArray(value)**](#arrayisarrayvalue)
     - [**Most methods support "thisArg"**](#most-methods-support-thisarg)
+  - [**Iterables**](#iterables)
+    - [**Array-likes**](#array-likes)
+    - [**Array.from**](#arrayfrom)
 
 # **[Objects](https://javascript.info/object-basics)**
 
@@ -288,7 +291,7 @@ for (let char of "Hello") {
 let str = "Hi"
 
 str[0] = "h" // error
-alert(str[0]) // doesn't wor
+alert(str[0]) // doesn't work
 ```
 
 ## **Searching for a substring**
@@ -609,7 +612,9 @@ alert(countries.sort((a, b) => a.localeCompare(b))) // Andorra,Österreich,Vietn
 
 ### **[reverse](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)**
 
-### **[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
+### **split** and **join**
+
+**[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
 
 ```js
 // Split example
@@ -636,7 +641,9 @@ let str = arr.join(";") // glue the array into a string using ;
 alert(str) // Bilbo;Gandalf;Nazgul
 ```
 
-### **[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
+### **reduce**/**reduceRight**
+
+**[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
 
 Used to calculate a single value based on the array.
 
@@ -656,3 +663,53 @@ To check if array or not. Returns `true` or `false`.
 ### **Most methods support "thisArg"**
 
 The value of `thisArg` parameter becomes `this` for `func`.
+
+## **[Iterables](https://javascript.info/iterable)**
+
+Allows us to make any object useable in a `for..of` loop.
+
+```js
+let range = {
+  from: 1,
+  to: 5,
+}
+
+// 1. call to for..of initially calls this
+range[Symbol.iterator] = function () {
+  // ...it returns the iterator object:
+  // 2. Onward, for..of works only with this iterator, asking it for next values
+  return {
+    current: this.from,
+    last: this.to,
+
+    // 3. next() is called on each iteration by the for..of loop
+    next() {
+      // 4. it should return the value as an object {done:.., value :...}
+      if (this.current <= this.last) {
+        return { done: false, value: this.current++ }
+      } else {
+        return { done: true }
+      }
+    },
+  }
+}
+
+// now it works!
+for (let num of range) {
+  alert(num) // 1, then 2, 3, 4, 5
+}
+```
+
+### **Array-likes**
+
+Array-likes: objects that have indexes and `length`, so they look like arrays.
+
+### **[Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)**
+
+Takes an iterable or array-like value and makes a "real" `Array` from it.
+
+`Array.from(obj[, mapFn, thisArg])`
+
+`mapFn` can be a function that will be applied to each element before adding it to the array.
+
+`thisArg` allows us to set `this`
