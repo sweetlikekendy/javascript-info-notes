@@ -68,6 +68,13 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Use case: caching**](#use-case-caching)
   - [**Object.keys, values, entries**](#objectkeys-values-entries)
     - [**Transforming objects**](#transforming-objects)
+  - [**Destructuring assignment**](#destructuring-assignment)
+    - [**Array Destructuring**](#array-destructuring)
+      - [**The rest '...'**](#the-rest-)
+      - [**Default values**](#default-values)
+    - [**Object destructuring**](#object-destructuring)
+      - [**Nested Destructuring**](#nested-destructuring)
+      - [**Smart function parameters**](#smart-function-parameters)
 
 # **[Objects](https://javascript.info/object-basics)**
 
@@ -911,4 +918,137 @@ let doublePrices = Object.fromEntries(
 )
 
 alert(doublePrices.meat) // 8
+```
+
+## **[Destructuring assignment](https://javascript.info/destructuring-assignment)**
+
+### **Array Destructuring**
+
+```js
+// we have an array with the name and surname
+let arr = ["John", "Smith"]
+
+// destructuring assignment
+// sets firstName = arr[0]
+// and surname = arr[1]
+let [firstName, surname] = arr
+```
+
+#### **The rest '...'**
+
+```js
+let [name1, name2, ...rest] = [
+  "Julius",
+  "Caesar",
+  "Consul",
+  "of the Roman Republic",
+]
+
+// rest is array of items, starting from the 3rd one
+alert(rest[0]) // Consul
+alert(rest[1]) // of the Roman Republic
+alert(rest.length) // 2
+```
+
+#### **Default values**
+
+```js
+let [firstName, surname] = []
+
+alert(firstName) // undefined
+alert(surname) // undefined
+
+// default values
+let [name = "Guest", surname = "Anonymous"] = ["Julius"]
+
+alert(name) // Julius (from array)
+alert(surname) // Anonymous (default used)
+```
+
+### **Object destructuring**
+
+```js
+let [firstName, surname] = []
+
+alert(firstName) // undefined
+alert(surname) // undefined
+
+// default values
+let [name = "Guest", surname = "Anonymous"] = ["Julius"]
+
+alert(name) // Julius (from array)
+alert(surname) // Anonymous (default used)
+```
+
+#### **Nested Destructuring**
+
+```js
+let options = {
+  size: {
+    width: 100,
+    height: 200,
+  },
+  items: ["Cake", "Donut"],
+  extra: true,
+}
+
+// destructuring assignment split in multiple lines for clarity
+let {
+  size: {
+    // put size here
+    width,
+    height,
+  },
+  items: [item1, item2], // assign items here
+  title = "Menu", // not present in the object (default value is used)
+} = options
+```
+
+#### **Smart function parameters**
+
+When creating functions with a lot of parameters, just pass in an object of the arguments as a paramater instead. Inside the function, you can destructure the arguments from the object.
+
+```js
+// we pass object to function
+let options = {
+  title: "My menu",
+  items: ["Item1", "Item2"],
+}
+
+// ...and it immediately expands it to variables
+function showMenu({
+  title = "Untitled",
+  width = 200,
+  height = 100,
+  items = [],
+}) {
+  // title, items – taken from options,
+  // width, height – defaults used
+  alert(`${title} ${width} ${height}`) // My Menu 200 100
+  alert(items) // Item1, Item2
+}
+
+// nested destructuring
+function showMenu({
+  title = "Untitled",
+  width: w = 100, // width goes to w
+  height: h = 200, // height goes to h
+  items: [item1, item2], // items first element goes to item1, second to item2
+}) {
+  alert(`${title} ${w} ${h}`) // My Menu 100 200
+  alert(item1) // Item1
+  alert(item2) // Item2
+}
+
+showMenu(options)
+```
+
+Destructuring assumes that `showMenu()` does have an argument. If we want all values by default, then we should specify an empty object:
+
+```js
+function showMenu({ title = "Menu", width = 100, height = 200 } = {}) {
+  alert(`${title} ${width} ${height}`)
+}
+
+showMenu() // Menu 100 200
 ```
