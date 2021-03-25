@@ -75,6 +75,19 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Object destructuring**](#object-destructuring)
       - [**Nested Destructuring**](#nested-destructuring)
       - [**Smart function parameters**](#smart-function-parameters)
+    - [**Data and time**](#data-and-time)
+  - [**Error Handling**](#error-handling)
+    - [**Try...catch**](#trycatch)
+    - [**Error object**](#error-object)
+    - [**Optional "catch" binding**](#optional-catch-binding)
+    - [**Error Object**](#error-object-1)
+      - [`name`](#name)
+      - [`message`](#message)
+      - [`stack`](#stack)
+    - [**"Throw" operator**](#throw-operator)
+    - [**Rethrowing**](#rethrowing)
+    - [**try…catch…finally**](#trycatchfinally)
+    - [**Global Catch**](#global-catch)
 
 # **[Objects](https://javascript.info/object-basics)**
 
@@ -1052,3 +1065,132 @@ function showMenu({ title = "Menu", width = 100, height = 200 } = {}) {
 
 showMenu() // Menu 100 200
 ```
+
+### **[Data and time](https://javascript.info/date)**
+
+## **[Error Handling](https://javascript.info/error-handling)**
+
+### **[Try...catch](https://javascript.info/try-catch)**
+
+![Try catch flow diagram](10-error_handling/images/try-catch/try-catch-flow.png)
+
+### **Error object**
+
+```js
+try {
+  // ...
+} catch (err) {
+  // <-- the "error object", could use another word instead of err
+  // ...
+}
+```
+
+### **Optional "catch" binding**
+
+If we don't need error details, `catch` may be omitted.
+
+### **Error Object**
+
+#### `name`
+
+Error name. For instance, for an undefined variable that’s "ReferenceError".
+
+#### `message`
+
+Textual message about error details.
+There are other non-standard properties available in most environments. One of most widely used and supported is:
+
+#### `stack`
+
+Current call stack: a string with information about the sequence of nested calls that led to the error. Used for debugging purposes.
+
+### **"Throw" operator**
+
+Built in constructors for standard errors: `Error`, `SyntaxError`, `ReferenceError`, `TypeError`
+
+For built-in errors, the `name` property is the same name as the constructor. The `message` property is taken from the argument passed in the constructor.
+
+Ex:
+
+```js
+let error = new Error("Things happen o_O")
+
+alert(error.name) // Error
+alert(error.message) // Things happen o_O
+```
+
+Example of throwing an error:
+
+```js
+let json = '{ "age": 30 }' // incomplete data
+
+try {
+  let user = JSON.parse(json) // <-- no errors
+
+  if (!user.name) {
+    throw new SyntaxError("Incomplete data: no name") // (*)
+  }
+
+  alert(user.name)
+} catch (err) {
+  alert("JSON Error: " + err.message) // JSON Error: Incomplete data: no name
+}
+```
+
+### **Rethrowing**
+
+**Catch should only process errors that it knows and “rethrow” all others.**
+
+Rethrowing technique:
+
+1. Catch gets all errors.
+2. In the `catch (err) {...}` block we analyze the error object `err`.
+3. If we don’t know how to handle it, we do `throw err`.
+
+### **try…catch…finally**
+
+`finally` block will always execute after a successful `try` block or after a `catch` block.
+
+The `finally` clause works for any exit from `try...catch`. That includes an explicit `return`.
+
+Ex:
+
+```js
+function func() {
+  try {
+    return 1
+  } catch (err) {
+    /* ... */
+  } finally {
+    alert("finally")
+  }
+}
+
+alert(func()) // finally alerted first, then 1
+```
+
+### **Global Catch**
+
+For a fatal error outside of `try...catch`.
+
+```js
+window.onerror = function (message, url, line, col, error) {
+  // ...
+}
+```
+
+| Parameter     | Description                                   |
+| ------------- | --------------------------------------------- |
+| `message`     | Error message.                                |
+| `url`         | URL of the script where error happened.       |
+| `line`, `col` | Line and column numbers where error happened. |
+| `error`       | Error object.                                 |
+
+The role of the global handler window.onerror is usually not to recover the script execution. There are also web-services that provide error-logging for such cases, like https://errorception.com or http://www.muscula.com.
+
+They work like this:
+
+1. We register at the service and get a piece of JS (or a script URL) from them to insert on pages.
+2. That JS script sets a custom window.onerror function.
+3. When an error occurs, it sends a network request about it to the service.
+4. We can log in to the service web interface and see errors.
