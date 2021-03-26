@@ -42,16 +42,16 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**concat**](#concat)
   - [**forEach**](#foreach)
   - [**Searching in array**](#searching-in-array-1)
-    - [**indexOf/lastIndexOf and includes**](#indexoflastindexof-and-includes)
-    - [**find and findIndex**](#find-and-findindex)
-    - [**filter**](#filter)
+    - [**`indexOf`/`lastIndexOf` and includes**](#indexoflastindexof-and-includes)
+    - [**`find` and `findIndex`**](#find-and-findindex)
+    - [**`filter`**](#filter)
   - [**Transform an array**](#transform-an-array)
-    - [**map**](#map)
-    - [**sort(fn)**](#sortfn)
-    - [**reverse**](#reverse)
-    - [**split** and **join**](#split-and-join)
-    - [**reduce**/**reduceRight**](#reducereduceright)
-    - [**Array.isArray(value)**](#arrayisarrayvalue)
+    - [**`map`**](#map)
+    - [**`sort(fn)`**](#sortfn)
+    - [**`reverse`**](#reverse)
+    - [**`split`** and **`join`**](#split-and-join)
+    - [**`reduce`**/**`reduceRight`**](#reducereduceright)
+    - [**`Array.isArray(value)`**](#arrayisarrayvalue)
     - [**Most methods support "thisArg"**](#most-methods-support-thisarg)
   - [**Iterables**](#iterables)
     - [**Array-likes**](#array-likes)
@@ -76,6 +76,22 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Nested Destructuring**](#nested-destructuring)
       - [**Smart function parameters**](#smart-function-parameters)
     - [**Data and time**](#data-and-time)
+      - [`new Date(milliseconds)`](#new-datemilliseconds)
+      - [`new Date(datestring)`](#new-datedatestring)
+      - [`new Date(year, month, date, hours, minutes, seconds, ms)`](#new-dateyear-month-date-hours-minutes-seconds-ms)
+    - [**Access date components**](#access-date-components)
+      - [`getFullYear()`](#getfullyear)
+      - [`getMonth()`](#getmonth)
+      - [`getDate()`](#getdate)
+      - [`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`](#gethours-getminutes-getseconds-getmilliseconds)
+      - [`getDay()`](#getday)
+      - [`getTime()`](#gettime)
+      - [`getTimezoneOffset()`](#gettimezoneoffset)
+    - [**Autocorrection**](#autocorrection)
+    - [**Date to number, date diff**](#date-to-number-date-diff)
+    - [**Date.now()**](#datenow)
+    - [**Benchmarking**](#benchmarking)
+    - [**`Date.parse` from a string**](#dateparse-from-a-string)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -88,6 +104,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Rethrowing**](#rethrowing)
     - [**try…catch…finally**](#trycatchfinally)
     - [**Global Catch**](#global-catch)
+  - [**Custom errors, extending Error**](#custom-errors-extending-error)
 
 # **[Objects](https://javascript.info/object-basics)**
 
@@ -551,7 +568,7 @@ Allows to run a function for every element of the array.
 
 ## **Searching in array**
 
-### **indexOf/lastIndexOf and includes**
+### **`indexOf`/`lastIndexOf` and includes**
 
 ```js
 let arr = [1, 0, false]
@@ -569,7 +586,7 @@ alert(arr.indexOf(NaN)) // -1 (should be 0, but === equality doesn't work for Na
 alert(arr.includes(NaN)) // true (correct)
 ```
 
-### **[find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find) and findIndex**
+### **[`find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find) and `findIndex`**
 
 ```js
 let result = arr.find(function (item, index, array) {
@@ -591,9 +608,9 @@ let user = users.find((item) => item.id == 1)
 alert(user.name) // John
 ```
 
-- `arr.findIndex` returns the index where the element was found instead of the element. Returns `-1` if nothing is found
+- [`arr.findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)) returns the index where the element was found instead of the element. Returns `-1` if nothing is found
 
-### **[filter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)**
+### **[`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)**
 
 Used if there are more than one instance in an array. Returns an array of all matching elements
 
@@ -619,7 +636,7 @@ alert(someUsers.length) // 2
 
 ## **Transform an array**
 
-### **[map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)**
+### **[`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)**
 
 ```js
 let result = arr.map(function (item, index, array) {
@@ -627,7 +644,7 @@ let result = arr.map(function (item, index, array) {
 })
 ```
 
-### **[sort(fn)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)**
+### **[`sort(fn)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)**
 
 All elements are converted to strings during compare.
 
@@ -642,9 +659,9 @@ let countries = ["Österreich", "Andorra", "Vietnam"]
 alert(countries.sort((a, b) => a.localeCompare(b))) // Andorra,Österreich,Vietnam (correct!)
 ```
 
-### **[reverse](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)**
+### **[`reverse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)**
 
-### **split** and **join**
+### **`split`** and **`join`**
 
 **[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
 
@@ -673,7 +690,7 @@ let str = arr.join(";") // glue the array into a string using ;
 alert(str) // Bilbo;Gandalf;Nazgul
 ```
 
-### **reduce**/**reduceRight**
+### **`reduce`**/**`reduceRight`**
 
 **[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
 
@@ -688,7 +705,7 @@ let value = arr.reduce(
 )
 ```
 
-### **[Array.isArray(value)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/isArray)**
+### **[`Array.isArray(value)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/isArray)**
 
 To check if array or not. Returns `true` or `false`.
 
@@ -1068,6 +1085,128 @@ showMenu() // Menu 100 200
 
 ### **[Data and time](https://javascript.info/date)**
 
+#### `new Date(milliseconds)`
+
+An integer number representing the number of milliseconds that has passed since the beginning of 1970 is called a timestamp.
+
+Dates before 01.01.1970 have negative timestamps
+
+#### `new Date(datestring)`
+
+If there is a single argument, and it’s a string, then it is parsed automatically. Uses `Date.parse`.
+
+#### `new Date(year, month, date, hours, minutes, seconds, ms)`
+
+- The `year` must have 4 digits: `2013` is okay, `98` is not.
+- The `month` count starts with `0` (Jan), up to `11` (Dec).
+- The `date` parameter is actually the day of month, if absent then `1` is assumed.
+- If `hours/minutes/seconds/ms` is absent, they are assumed to be equal `0`.
+
+```js
+new Date(2011, 0, 1, 0, 0, 0, 0) // 1 Jan 2011, 00:00:00
+new Date(2011, 0, 1) // the same, hours etc are 0 by default
+
+let date = new Date(2011, 0, 1, 2, 3, 4, 567)
+alert(date) // 1.01.2011, 02:03:04.567
+```
+
+### **Access date components**
+
+#### [`getFullYear()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getFullYear)
+
+Get the year (4 digits)
+
+#### [`getMonth()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth)
+
+Get the month, from 0 to 11.
+
+#### [`getDate()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDate)
+
+Get the day of month, from 1 to 31, the name of the method does look a little bit strange.
+
+#### `getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`
+
+Mdn links:
+[`getHours()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getHours), [`getMinutes()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMinutes), [`getSeconds()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getSeconds), [`getMilliseconds()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMilliseconds)
+
+Get the corresponding time components.
+
+#### [`getDay()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay)
+
+Get the day of week, from 0 (Sunday) to 6 (Saturday). The first day is always Sunday, in some countries that’s not so, but can’t be changed.
+
+**All the methods above return the components relative to the local time zone.**
+
+No UTC-variant:
+
+#### [`getTime()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)
+
+Returns the timestamp for the date – a number of milliseconds passed from the January 1st of 1970 UTC+0.
+
+#### [`getTimezoneOffset()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset)
+
+Returns the difference between UTC and the local time zone, in minutes:
+
+### **Autocorrection**
+
+We can set out-of-range values, and it will auto-adjust itself.
+
+### **Date to number, date diff**
+
+`Date` object convert to number = timestamp = same as `date.getTime()`.
+
+Dates can be subtracted, result is difference in ms.
+
+### **Date.now()**
+
+If we just want to measure time. `Date.now()` = `new Date().getTime()`. `Date.now()` doesnt create an intermediate `Date` object. It's faster and doesn't put pressure on garbage collection.
+
+### **Benchmarking**
+
+```js
+function diffSubtract(date1, date2) {
+  return date2 - date1
+}
+
+function diffGetTime(date1, date2) {
+  return date2.getTime() - date1.getTime()
+}
+
+function bench(f) {
+  let date1 = new Date(0)
+  let date2 = new Date()
+
+  let start = Date.now()
+  for (let i = 0; i < 100000; i++) f(date1, date2)
+  return Date.now() - start
+}
+
+let time1 = 0
+let time2 = 0
+
+// added for "heating up" prior to the main loop
+bench(diffSubtract)
+bench(diffGetTime)
+
+// run bench(diffSubtract) and bench(diffGetTime) each 10 times alternating
+for (let i = 0; i < 10; i++) {
+  time1 += bench(diffSubtract)
+  time2 += bench(diffGetTime)
+}
+
+alert("Total time for diffSubtract: " + time1)
+alert("Total time for diffGetTime: " + time2)
+```
+
+### **[`Date.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse) from a string**
+
+`YYYY-MM-DDTHH:mm:ss.sssZ` returns the timestamp
+
+- `YYYY-MM-DD` – is the date: year-month-day. Can also use `YYYY-MM` or `YYYY`.
+- The character `"T"` is used as the delimiter.
+- `HH:mm:ss.sss` – is the time: hours, minutes, seconds and milliseconds.
+- The optional `"Z"` part denotes the time zone in the format `+-hh:mm`. A single letter `Z` would mean UTC+0.
+
 ## **[Error Handling](https://javascript.info/error-handling)**
 
 ### **[Try...catch](https://javascript.info/try-catch)**
@@ -1194,3 +1333,5 @@ They work like this:
 2. That JS script sets a custom window.onerror function.
 3. When an error occurs, it sends a network request about it to the service.
 4. We can log in to the service web interface and see errors.
+
+## **[Custom errors, extending Error](https://javascript.info/custom-errors)**
