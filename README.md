@@ -92,6 +92,18 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Date.now()**](#datenow)
     - [**Benchmarking**](#benchmarking)
     - [**`Date.parse` from a string**](#dateparse-from-a-string)
+  - [**JSON methods**](#json-methods)
+    - [**`JSON.stringify`**](#jsonstringify)
+    - [**Excluding and transforming: replacer**](#excluding-and-transforming-replacer)
+      - [**value**](#value)
+      - [**replacer**](#replacer)
+      - [**space**](#space)
+    - [**Formatting: space**](#formatting-space)
+    - [**Custom “toJSON”**](#custom-tojson)
+    - [**`JSON.parse`**](#jsonparse)
+      - [**str**](#str)
+      - [**reviver**](#reviver)
+    - [**Using reviver**](#using-reviver)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1206,6 +1218,170 @@ alert("Total time for diffGetTime: " + time2)
 - The character `"T"` is used as the delimiter.
 - `HH:mm:ss.sss` – is the time: hours, minutes, seconds and milliseconds.
 - The optional `"Z"` part denotes the time zone in the format `+-hh:mm`. A single letter `Z` would mean UTC+0.
+
+## **[JSON methods](https://javascript.info/json)**
+
+### **`JSON.stringify`**
+
+Convert object to string. Can also be applied to primitives. Single quotes -> Double quotes, object property names -> double quotes.
+
+JSON is data-only language-independent. Some JavaScript object properties are skipped:
+
+- Function properties (methods).
+- Symbolic keys and values.
+- Properties that store `undefined`.
+
+```js
+let user = {
+  sayHi() {
+    // ignored
+    alert("Hello")
+  },
+  [Symbol("id")]: 123, // ignored
+  something: undefined, // ignored
+}
+
+alert(JSON.stringify(user)) // {} (empty object)
+```
+
+Nested objects are converted automatically.
+
+_No circular references_
+
+### **Excluding and transforming: replacer**
+
+`JSON.stringify(value[, replacer, space])`
+
+#### **value**
+
+A value to encode.
+
+#### **replacer**
+
+Array of properties to encode or a mapping function function(key, value).
+
+#### **space**
+
+Amount of space to use for formatting
+
+```js
+let room = {
+  number: 23,
+}
+
+let meetup = {
+  title: "Conference",
+  participants: [{ name: "John" }, { name: "Alice" }],
+  place: room, // meetup references room
+}
+
+room.occupiedBy = meetup // room references meetup
+
+alert(JSON.stringify(meetup, ["title", "participants"]))
+// {"title":"Conference","participants":[{},{}]}
+
+alert(
+  JSON.stringify(meetup, ["title", "participants", "place", "name", "number"])
+)
+/*
+{
+  "title":"Conference",
+  "participants":[{"name":"John"},{"name":"Alice"}],
+  "place":{"number":23}
+}
+*/
+
+alert(
+  JSON.stringify(meetup, function replacer(key, value) {
+    alert(`${key}: ${value}`)
+    return key == "occupiedBy" ? undefined : value
+  })
+)
+
+/* key:value pairs that come to replacer:
+:             [object Object]
+title:        Conference
+participants: [object Object],[object Object]
+0:            [object Object]
+name:         John
+1:            [object Object]
+name:         Alice
+place:        [object Object]
+number:       23
+occupiedBy: [object Object]
+*/
+```
+
+### **Formatting: space**
+
+```js
+let user = {
+  name: "John",
+  age: 25,
+  roles: {
+    isAdmin: false,
+    isEditor: true
+  }
+};
+
+alert(JSON.stringify(user, null, 2));
+/* two-space indents:
+{
+  "name": "John",
+  "age": 25,
+  "roles": {
+    "isAdmin": false,
+    "isEditor": true
+  }
+}
+```
+
+### **Custom “toJSON”**
+
+Objects may provide `toJSON` method for to-JSON convsersions. `JSON.stringify` will automatically call the `toJSON` method if it's available.
+
+### **`JSON.parse`**
+
+`JSON.parse(str, [reviver]);`
+
+To decode a JSON-string
+
+#### **str**
+
+JSON-string to parse.
+
+#### **reviver**
+
+Optional function(key,value) that will be called for each (key, value) pair and can transform the value.
+
+Mistakes for hand-written JSON:
+
+```js
+let json = `{
+  name: "John",                     // mistake: property name without quotes
+  "surname": 'Smith',               // mistake: single quotes in value (must be double)
+  'isAdmin': false                  // mistake: single quotes in key (must be double)
+  "birthday": new Date(2000, 2, 3), // mistake: no "new" is allowed, only bare values
+  "friends": [0,1,2,3]              // here all fine
+}`
+```
+
+### **Using reviver**
+
+```js
+let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}'
+
+let meetup = JSON.parse(str)
+
+alert(meetup.date.getDate()) // Error!
+
+let meetup = JSON.parse(str, function (key, value) {
+  if (key == "date") return new Date(value)
+  return value
+})
+
+alert(meetup.date.getDate()) // now works!
+```
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
