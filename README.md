@@ -104,6 +104,12 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**str**](#str)
       - [**reviver**](#reviver)
     - [**Using reviver**](#using-reviver)
+  - [**Advanced working with functions**](#advanced-working-with-functions)
+    - [**Recursion and Stack**](#recursion-and-stack)
+      - [**The execution context and stack**](#the-execution-context-and-stack)
+      - [**Recursive traversals**](#recursive-traversals)
+      - [**Recursive structures**](#recursive-structures)
+        - [**Linked List**](#linked-list)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1382,6 +1388,64 @@ let meetup = JSON.parse(str, function (key, value) {
 
 alert(meetup.date.getDate()) // now works!
 ```
+
+## **[Advanced working with functions](https://javascript.info/advanced-functions)**
+
+### **[Recursion and Stack](https://javascript.info/recursion)**
+
+Recursion depth equals the maximal number of context in the stack.
+
+#### **The execution context and stack**
+
+Information about the process of execution of a running function is stored in _execution context_.
+
+One function has one execution context associated with it.
+
+#### **Recursive traversals**
+
+```js
+let company = {
+  // the same object, compressed for brevity
+  sales: [
+    { name: "John", salary: 1000 },
+    { name: "Alice", salary: 1600 },
+  ],
+  development: {
+    sites: [
+      { name: "Peter", salary: 2000 },
+      { name: "Alex", salary: 1800 },
+    ],
+    internals: [{ name: "Jack", salary: 1300 }],
+  },
+}
+
+// The function to do the job
+function sumSalaries(department) {
+  if (Array.isArray(department)) {
+    // case (1)
+    return department.reduce((prev, current) => prev + current.salary, 0) // sum the array
+  } else {
+    // case (2)
+    let sum = 0
+    for (let subdep of Object.values(department)) {
+      sum += sumSalaries(subdep) // recursively call for subdepartments, sum the results
+    }
+    return sum
+  }
+}
+
+alert(sumSalaries(company)) // 7700
+```
+
+#### **Recursive structures**
+
+HTML document, an HTML-tag may contain a list of:
+
+- Text pieces.
+- HTML-comments.
+- Other HTML-tags (that in turn may contain text pieces/comments or other tags etc).
+
+##### **Linked List**
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
