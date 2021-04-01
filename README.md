@@ -110,6 +110,11 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Recursive traversals**](#recursive-traversals)
       - [**Recursive structures**](#recursive-structures)
         - [**Linked List**](#linked-list)
+    - [**Rest parameters and spread syntax**](#rest-parameters-and-spread-syntax)
+      - [**Rest parameters `...`**](#rest-parameters-)
+      - [**The “arguments” variable**](#the-arguments-variable)
+      - [**Spread syntax**](#spread-syntax)
+      - [**Copy an array/object**](#copy-an-arrayobject)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1446,6 +1451,53 @@ HTML document, an HTML-tag may contain a list of:
 - Other HTML-tags (that in turn may contain text pieces/comments or other tags etc).
 
 ##### **Linked List**
+
+### **[Rest parameters and spread syntax](https://javascript.info/rest-parameters-spread)**
+
+#### **Rest parameters `...`**
+
+Rest parameters must always go at the end.
+
+```js
+function sumAll(...args) {
+  // args is the name for the array
+  let sum = 0
+
+  for (let arg of args) sum += arg
+
+  return sum
+}
+
+alert(sumAll(1)) // 1
+alert(sumAll(1, 2)) // 3
+alert(sumAll(1, 2, 3)) // 6
+```
+
+#### **The “arguments” variable**
+
+Special array-like object that contains all arguments by index. Not used much any more. Cannot use array methods with `arguments` variable. Arrow functions do not have `arguments`.
+
+#### **Spread syntax**
+
+Spread syntax uses iterators to gather elements, same way as `for..of`.
+
+#### **Copy an array/object**
+
+```js
+let obj = { a: 1, b: 2, c: 3 }
+
+let objCopy = { ...obj } // spread the object into a list of parameters
+// then return the result in a new object
+
+// the above is the same as below
+let objCopyAssign = Object.assign({}, obj)
+
+// do the objects have the same contents?
+alert(JSON.stringify(obj) === JSON.stringify(objCopy)) // true
+
+// are the objects equal?
+alert(obj === objCopy) // false (not same reference)
+```
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
