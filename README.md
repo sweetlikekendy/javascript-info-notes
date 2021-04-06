@@ -124,6 +124,7 @@ My notes from the [javascript.info](https://javascript.info) website.
         - [Closure](#closure)
     - [**Garbage Collection**](#garbage-collection-1)
       - [**Real-life optimizations**](#real-life-optimizations)
+  - [**The old "var"**](#the-old-var)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1662,6 +1663,10 @@ function f() {
 let g = f()
 g()
 ```
+
+## **[The old "var"](https://javascript.info/var)**
+
+Skipped for now.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
