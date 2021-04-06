@@ -115,6 +115,15 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**The “arguments” variable**](#the-arguments-variable)
       - [**Spread syntax**](#spread-syntax)
       - [**Copy an array/object**](#copy-an-arrayobject)
+    - [**Variable scope, closure**](#variable-scope-closure)
+      - [**Lexical Environment**](#lexical-environment)
+        - [**1. Variables**](#1-variables)
+        - [**2. Function Declarations**](#2-function-declarations)
+        - [**3. Inner and outer LE**](#3-inner-and-outer-le)
+        - [**4. Returning a function**](#4-returning-a-function)
+        - [Closure](#closure)
+    - [**Garbage Collection**](#garbage-collection-1)
+      - [**Real-life optimizations**](#real-life-optimizations)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1498,6 +1507,124 @@ alert(JSON.stringify(obj) === JSON.stringify(objCopy)) // true
 // are the objects equal?
 alert(obj === objCopy) // false (not same reference)
 ```
+
+### **[Variable scope, closure](https://javascript.info/closure)**
+
+#### **Lexical Environment**
+
+##### **1. Variables**
+
+In JS, there is an internal (hidden) associated object known as the _Lexical Environment_.
+
+Lexical Environment (LE) consists of 2 parts:
+
+1. _Environment Record_ - an object that stores all local variables as its properties (and other information like the value of `this`).
+2. A reference to the _outer lexical environment_.
+
+**A variable is just a property of the special internal object, `Enviroment Record`. To get or change a variable means to get ro change a property of that object.**
+
+![Variable in lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/variable-initialization.png)
+
+##### **2. Function Declarations**
+
+Function declaration is instantally fully initialized.
+
+![Function in lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-initialization.png)
+
+This only happens with function declarations and not function expressions such as `let say = function(name)...`.
+
+##### **3. Inner and outer LE**
+
+When a function runs, at the beginning of the call, a new LE is created automatically to store local variables and parameters of the call.
+
+![Inner and outer lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/inner-outer-lexical-environment.png)
+
+During function call we have two LEs: inner for fn call, outer for global.
+
+Inner LE has a reference to the outer one.
+
+**When code wants to access a variable, it always starts with the inner, then works outward.**
+
+If a variable is not found anywhere, that’s an error in strict mode (without use strict, an assignment to a non-existing variable creates a new global variable, for compatibility with old code).
+
+![Inner and outer variable access lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/inner-outer-variable-access.png)
+
+##### **4. Returning a function**
+
+```js
+function makeCounter() {
+  let count = 0
+
+  return function () {
+    return count++
+  }
+}
+
+let counter = makeCounter()
+```
+
+At the beginning of each `makeCounter()` call, a new Lexical Environment object is created, to store variables for this `makeCounter` run.
+
+![Function returns 1 lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-returns-lexical-environment-1.png)
+
+At first, the nested `function()` does not run, it is only created.
+
+![Function returns 2 lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-returns-lexical-environment-2.png)
+
+`counter.[[Enviroment]]` has the reference to `{count: 0}` LE. `[[Environment]]` reference is set once and forever at fucntion creation time.
+
+When `counter()` is called, a new LE is created for call, and its outer LE reference is taken from `counter.[[Environment]]`
+
+![Function returns 3 lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-returns-lexical-environment-3.png)
+
+When code inside `counter()` looks for `count` variable, it searches its own LE. If it's not there, it moves to next outer LE.
+
+**The `count` variable is updated in the LE where it lives.**
+
+![Function returns 4 lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-returns-lexical-environment-4.png)
+
+##### Closure
+
+A closure is a function that remembers its outer variables and can access them. In JS, all fns are naturally closures. Fns automatically remember where they were created using a hidden `[[Enviroment]]` property, and then their code can access outer variables.
+
+_From Amanda's email:_
+
+A closure is a way of keeping access to variables in a function after that function has returned.
+
+A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). In other words, a closure gives you access to an outer function’s scope from an inner function. In JavaScript, closures are created every time a function is created, at function creation time.
+
+To use a closure, define a function inside another function and expose it. To expose a function, return it or pass it to another function.
+
+The inner function will have access to the variables in the outer function scope, even after the outer function has returned.
+
+In JavaScript, closures are the primary mechanism used to enable data privacy. When you use closures for data privacy, the enclosed variables are only in scope within the containing (outer) function. You can’t get at the data from an outside scope except through the object’s privileged methods.
+
+Currying function or Callback can be considered closures
+
+### **Garbage Collection**
+
+Usually, a LE is removed from memory with all the variables after the fn call finishes. As any JS object, it's only kept in memory while it's reachable. If there's a nested fn that si still reachable after the end of a fn, then it has `[[Environment]]` property that references the LE.
+
+```js
+function f() {
+  let value = 123
+
+  return function () {
+    alert(value)
+  }
+}
+
+let g = f() // g.[[Environment]] stores a reference to the Lexical Environment
+// of the corresponding f() call
+
+// 3 functions in array, every one of them links to Lexical Environment
+// from the corresponding f() run
+let arr = [f(), f(), f()]
+
+g = null // ...and now the memory is cleaned up
+```
+
+#### **Real-life optimizations**
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
