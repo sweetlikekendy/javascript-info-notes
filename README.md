@@ -1626,6 +1626,43 @@ g = null // ...and now the memory is cleaned up
 
 #### **Real-life optimizations**
 
+Javascript engines will try to optimize keeping all outer variables alive while function is alive.
+
+**An important side effect in V8 (Chrome, Edge, Opera) is that such variable will become unavailable in debugging.**
+
+```js
+function f() {
+  let value = Math.random()
+
+  function g() {
+    // As you could see – there is no such variable! In theory, it should be accessible, but the engine optimized it out.
+    debugger // in console: type alert(value); No such variable!
+  }
+
+  return g
+}
+
+let g = f()
+g()
+```
+
+```js
+let value = "Surprise!"
+
+function f() {
+  let value = "the closest value"
+
+  function g() {
+    debugger // in console: type alert(value); Surprise!
+  }
+
+  return g
+}
+
+let g = f()
+g()
+```
+
 ## **[Error Handling](https://javascript.info/error-handling)**
 
 ### **[Try...catch](https://javascript.info/try-catch)**
