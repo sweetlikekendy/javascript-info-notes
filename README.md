@@ -125,6 +125,9 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Garbage Collection**](#garbage-collection-1)
       - [**Real-life optimizations**](#real-life-optimizations)
   - [**The old "var"**](#the-old-var)
+  - [**Global object**](#global-object)
+    - [**Using for polyfills**](#using-for-polyfills)
+  - [**Function object, NFE**](#function-object-nfe)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1667,6 +1670,53 @@ g()
 ## **[The old "var"](https://javascript.info/var)**
 
 Skipped for now.
+
+## **[Global object](https://javascript.info/global-object)**
+
+Global object provides variables and functions that are available anywhere.
+
+In a browser it is named `window`, for Node.js it is `global`, for other environments it may have another name.
+
+Recently, `globalThis` was added to the language, as a standardized nme for a global objct, that should be supported across all environments.
+
+```js
+alert("Hello")
+// is the same as
+window.alert("Hello")
+```
+
+Global fns and variables declared with `var` become the property of the global object. Does not happen with `let`/`const`.
+
+If you want something to be accessed globally, write it directly as below. **Using global variables is generally discouraged and/or used minimally.**
+
+```js
+// make current user information global, to let all scripts access it
+window.currentUser = {
+  name: "John",
+}
+
+// somewhere else in code
+alert(currentUser.name) // John
+
+// or, if we have a local variable with the name "currentUser"
+// get it from window explicitly (safe!)
+alert(window.currentUser.name) // John
+```
+
+### **Using for polyfills**
+
+Use the global object to test for support of modern language features.
+
+```js
+if (!window.Promise) {
+  alert("Your browser is really old!")
+  window.Promise = ... // custom implementation of the modern language feature
+}
+```
+
+## **[Function object, NFE](https://javascript.info/function-object)**
+
+Fns are objects. Imagine functions as callable "action objects". We can call them, add/remove properties, pass by ref etc.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
