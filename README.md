@@ -128,6 +128,10 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**Global object**](#global-object)
     - [**Using for polyfills**](#using-for-polyfills)
   - [**Function object, NFE**](#function-object-nfe)
+    - [**The name property**](#the-name-property)
+    - [**The length property**](#the-length-property)
+    - [**Custom properties**](#custom-properties)
+    - [**Named Fn Expression**](#named-fn-expression)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1717,6 +1721,210 @@ if (!window.Promise) {
 ## **[Function object, NFE](https://javascript.info/function-object)**
 
 Fns are objects. Imagine functions as callable "action objects". We can call them, add/remove properties, pass by ref etc.
+
+### **The name property**
+
+A fn's name is accessible as the "name" property.
+
+Even assigns correct name to a function if it's created without one.
+
+```js
+let sayHi = function () {
+  alert("Hi")
+}
+
+alert(sayHi.name) // sayHi (there's a name!)
+```
+
+Also works as a default value in a fn parameter.
+
+Names can be figured out from context.
+
+```js
+let user = {
+  sayHi() {
+    // ...
+  },
+
+  sayBye: function () {
+    // ...
+  },
+}
+
+alert(user.sayHi.name) // sayHi
+alert(user.sayBye.name) // sayBye
+```
+
+Doesn't always work though.
+
+```js
+// function created inside array
+let arr = [function () {}]
+
+alert(arr[0].name) // <empty string>
+// the engine has no way to set up the right name, so there is none
+```
+
+### **The length property**
+
+Returns number of fn parameters. Rest parameters are not counted.
+
+For instance, in the code below the `ask` function accepts a `question` to ask and an arbitrary number of handler functions to call.
+
+Once a user provides their answer, the function calls the handlers. We can pass two kinds of handlers:
+
+A zero-argument function, which is only called when the user gives a positive answer.
+A function with arguments, which is called in either case and returns an answer.
+
+To call `handler` the right way, we examine the `handler.length` property.
+
+The idea is that we have a simple, no-arguments handler syntax for positive cases (most frequent variant), but are able to support universal handlers as well:
+
+```js
+function ask(question, ...handlers) {
+  let isYes = confirm(question)
+
+  for (let handler of handlers) {
+    if (handler.length == 0) {
+      if (isYes) handler()
+    } else {
+      handler(isYes)
+    }
+  }
+}
+
+// for positive answer, both handlers are called
+// for negative answer, only the second one
+ask(
+  "Question?",
+  () => alert("You said yes"),
+  (result) => alert(result)
+)
+```
+
+### **Custom properties**
+
+```js
+function sayHi() {
+  alert("Hi")
+
+  // let's count how many times we run
+  sayHi.counter++
+}
+sayHi.counter = 0 // initial value
+
+sayHi() // Hi
+sayHi() // Hi
+
+alert(`Called ${sayHi.counter} times`) // Called 2 times
+```
+
+**A property is not a variable. `let counter` and a property `counter` are two unrelated things.**
+
+Fn properties can replace closures sometimes.
+
+Rewritten from [variable scope, closure](#variable-scope-closure) section.
+
+```js
+function makeCounter() {
+  // instead of:
+  // let count = 0
+
+  function counter() {
+    return counter.count++
+  }
+
+  counter.count = 0
+
+  return counter
+}
+
+let counter = makeCounter()
+alert(counter()) // 0
+alert(counter()) // 1
+```
+
+The `count` is now stored in the fn directly, not in its outer LE.
+
+Main difference between this way and closure way: if `count` lives in an outer variable, then external code is unable to access it. Only nested fns may modify it. If it's bound to a fn, then this is possible:
+
+```js
+function makeCounter() {
+  function counter() {
+    return counter.count++
+  }
+
+  counter.count = 0
+
+  return counter
+}
+
+let counter = makeCounter()
+
+counter.count = 10
+alert(counter()) // 10
+```
+
+### **Named Fn Expression**
+
+Term for fn expressions that have a name.
+
+```js
+let sayHi = function func(who) {
+  alert(`Hello, ${who}`)
+}
+
+sayHi("John") // Hello, John
+```
+
+The fn call is still `sayHi(...)`.
+
+2 special things about the name `func`:
+
+1. Allows the fn to reference itself internally.
+2. It is not visible outside of the fn.
+
+```js
+let sayHi = function func(who) {
+  if (who) {
+    alert(`Hello, ${who}`)
+  } else {
+    func("Guest") // use func to re-call itself
+  }
+}
+
+sayHi() // Hello, Guest
+
+// But this won't work:
+func() // Error, func is not defined (not visible outside of the function)
+```
+
+Why use `func`? In most cases we can use `sayHi` for the nested call.
+
+The problem with using `sayHi` for the nested call is that `sayHi` may change in the outer code.
+
+```js
+let sayHi = function (who) {
+  if (who) {
+    alert(`Hello, ${who}`)
+  } else {
+    sayHi("Guest") // Error: sayHi is not a function
+  }
+}
+
+let welcome = sayHi
+sayHi = null
+
+welcome() // Error, the nested sayHi call doesn't work any more!
+```
+
+That happens because the function takes `sayHi` from its outer lexical environment. There’s no local `sayHi`, so the outer variable is used. And at the moment of the call that outer `sayHi` is `null`.
+
+Use `func` as the named function express will fix the code above. This works because the name `"func" `is function-local. It is not taken from outside (and not visible there). The specification guarantees that it will always reference the current function.
+
+The outer code still has its variable sayHi or welcome. And func is an “internal function name”, how the function can call itself internally.
+
+No such thing for `Function Declaration`.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
