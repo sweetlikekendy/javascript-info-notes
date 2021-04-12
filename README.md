@@ -133,6 +133,20 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Custom properties**](#custom-properties)
     - [**Named Fn Expression**](#named-fn-expression)
   - [**The "new Function" syntax**](#the-new-function-syntax)
+    - [**Closures**](#closures)
+  - [**Scheduling: setTimeout and setInterval**](#scheduling-settimeout-and-setinterval)
+    - [**setTimeout**](#settimeout)
+      - [**`func|code`**](#funccode)
+      - [**`delay`**](#delay)
+      - [**`arg1, arg2`...**](#arg1-arg2)
+      - [**Pass a fn, but don't run it**](#pass-a-fn-but-dont-run-it)
+      - [`Canceling with clearTimeout`](#canceling-with-cleartimeout)
+    - [**setInterval**](#setinterval)
+      - [**Time goes on while `alert` is shown**](#time-goes-on-while-alert-is-shown)
+    - [**Nested timeout**](#nested-timeout)
+      - [**Garbagte collection and setInterval/setTimeout callback**](#garbagte-collection-and-setintervalsettimeout-callback)
+    - [**Zero delay setTimeout**](#zero-delay-settimeout)
+      - [**Zero delay is in fact not zero (in a browser)**](#zero-delay-is-in-fact-not-zero-in-a-browser)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1943,7 +1957,143 @@ let sayHi = new Function('alert("Hello")')
 sayHi() // Hello
 ```
 
+### **Closures**
+
 When a fn is created using `new Function`, its `[[Environment]]` is set to reference the global one. Such fn doesn't have access to outer variables, only to the global ones.
+
+## **[Scheduling: setTimeout and setInterval](https://javascript.info/settimeout-setinterval)**
+
+- `setTimeout` run a fn once after the interval of time.
+- `setInterval` run a fn repeatedly, starting after the itnerval of time, then repeating continuously at that interval.
+
+### **setTimeout**
+
+```js
+let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
+```
+
+#### **`func|code`**
+
+Fn or string of code to execute. Usually it's a fn.
+
+#### **`delay`**
+
+The delay before run, in ms (1000ms = 1 sec), by default 0.
+
+#### **`arg1, arg2`...**
+
+Arguments for the fn (not supported in IE9)
+
+#### **Pass a fn, but don't run it**
+
+```js
+setTimeout(sayHi(), 1000) // wrong!
+```
+
+`setTimeout` expects a reference to a fn. `sayHi()` runs the fn and the result of its execution is passed to `setTimeout`.
+
+#### `Canceling with clearTimeout`
+
+`setTimeout` returns a `timerId` that we can use to cancel the execution.
+
+```js
+let timerId= setTimeout(...)
+clearTimeout(timerId);
+```
+
+In a browser the timer identifier is a number. In other environments, this can be something else. Ex. node returns timer obj with additional methods.
+
+### **setInterval**
+
+```js
+let timerId = setInterval(func|code, [delay], [arg1], [arg2], ...)
+```
+
+Runs regularly after the given interval of time. To stop further calls, use `clearInterval(timerId)`.
+
+```js
+// show message every 2 secs, after 5 seconds, stop
+// repeat with the interval of 2 seconds
+let timerId = setInterval(() => alert("tick"), 2000)
+
+// after 5 seconds stop
+setTimeout(() => {
+  clearInterval(timerId)
+  alert("stop")
+}, 5000)
+```
+
+#### **Time goes on while `alert` is shown**
+
+If you run the above code without dismissing the alert, then the next `alert` will be shown immediately as you do it. This happens with `alert/confirm/prompt`.
+
+### **Nested timeout**
+
+**Nested setTimeout allows to set the delay between the executions more precisely than setInterval.**
+
+```js
+let i = 1
+setInterval(function () {
+  func(i++)
+}, 100)
+```
+
+![setInterval edge case](6-advanced_working_with_functions/images/setTimeout-setInterval/setInterval-edge-case.png)
+
+`func`'s execution consumes a part of the interval. It is possible for `func`'s execution tot take longer than 100ms. In this case the engine waits for `func` to complete, then checks the scheduler and if the tiem is up, runs it again _immediately_. `setInterval` will run for as long as it takes the func to execute.
+
+```js
+let i = 1
+setTimeout(function run() {
+  func(i++)
+  setTimeout(run, 100)
+}, 100)
+```
+
+![setTimeout fixed delay](6-advanced_working_with_functions/images/setTimeout-setInterval/setTimeout-guarantee-fix-delay.png)
+
+**`setTimeout` will guarantee the fixed delay.**
+
+#### **Garbagte collection and setInterval/setTimeout callback**
+
+When fn is passed in `setInterval/setTimeout`, an internal reference is created to it and saved in the scheduler. This prevents the fn from being garbage collected, even if there are no other references to it.
+
+```js
+// the function stays in memory until the scheduler calls it
+setTimeout(function() {...}, 100);
+```
+
+`setInterval` the fn stays in memory until `clearInterval` is called.
+
+Caution side-effect: a fn references the outer LE, so, while it lives, outer variables live too. The variables maytake much more memory than the fn itself, so when we don't need the fn any more, it's better to cancel it.
+
+### **Zero delay setTimeout**
+
+`setTimeout(func, 0)`, or just `setTimeout(func)`.
+
+This schedules the execution of `func` ASAP. But the scheduler will invoke it only after the currently executing script is complete.
+
+#### **Zero delay is in fact not zero (in a browser)**
+
+The [HTML5 standard](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timers) says: “after five nested timers, the interval is forced to be at least 4 milliseconds.”.
+
+```js
+let start = Date.now()
+let times = []
+
+setTimeout(function run() {
+  times.push(Date.now() - start) // remember delay from the previous call
+
+  if (start + 100 < Date.now()) alert(times)
+  // show the delays after 100ms
+  else setTimeout(run) // else re-schedule
+})
+
+// an example of the output:
+// 1,1,1,1,9,15,20,24,30,35,40,45,50,55,59,64,70,75,80,85,90,95,100
+```
+
+Similiar thing happens to `setInterval` instead of `setTimeout`.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
