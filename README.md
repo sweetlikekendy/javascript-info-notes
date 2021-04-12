@@ -132,6 +132,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**The length property**](#the-length-property)
     - [**Custom properties**](#custom-properties)
     - [**Named Fn Expression**](#named-fn-expression)
+  - [**The "new Function" syntax**](#the-new-function-syntax)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -1925,6 +1926,24 @@ Use `func` as the named function express will fix the code above. This works bec
 The outer code still has its variable sayHi or welcome. And func is an “internal function name”, how the function can call itself internally.
 
 No such thing for `Function Declaration`.
+
+## **[The "new Function" syntax](https://javascript.info/new-function)**
+
+Takes string to make fn.
+
+```js
+let func = new Function([arg1, arg2, ...argN], functionBody)
+
+let sum = new Function("a", "b", "return a + b")
+
+alert(sum(1, 2)) // 3
+
+let sayHi = new Function('alert("Hello")')
+
+sayHi() // Hello
+```
+
+When a fn is created using `new Function`, its `[[Environment]]` is set to reference the global one. Such fn doesn't have access to outer variables, only to the global ones.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
