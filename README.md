@@ -147,6 +147,13 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Garbagte collection and setInterval/setTimeout callback**](#garbagte-collection-and-setintervalsettimeout-callback)
     - [**Zero delay setTimeout**](#zero-delay-settimeout)
       - [**Zero delay is in fact not zero (in a browser)**](#zero-delay-is-in-fact-not-zero-in-a-browser)
+  - [**Decorators and forwarding, call/apply**](#decorators-and-forwarding-callapply)
+    - [**Transparent caching**](#transparent-caching)
+    - [**Using "func.call" for the context**](#using-funccall-for-the-context)
+    - [**Going multi-argument**](#going-multi-argument)
+      - [**func.apply**](#funcapply)
+      - [**Borrowing a method**](#borrowing-a-method)
+    - [**Decorators and function properties**](#decorators-and-function-properties)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -2094,6 +2101,201 @@ setTimeout(function run() {
 ```
 
 Similiar thing happens to `setInterval` instead of `setTimeout`.
+
+## **[Decorators and forwarding, call/apply](https://javascript.info/call-apply-decorators)**
+
+### **Transparent caching**
+
+Say we have a fn `slow(x)` which is CPU-heavy, but results are stable. Meaning that the `x` always returns the same results. We may want to cache the results to avoid spending extra-time on recalcuations. Instead of adding that functionality into `slow()` we'll create a wrapper fn.
+
+```js
+function slow(x) {
+  // there can be a heavy CPU-intensive job here
+  alert(`Called with ${x}`)
+  return x
+}
+
+function cachingDecorator(func) {
+  let cache = new Map()
+
+  return function (x) {
+    if (cache.has(x)) {
+      // if there's such key in cache
+      return cache.get(x) // read the result from it
+    }
+
+    let result = func(x) // otherwise call func
+
+    cache.set(x, result) // and cache (remember) the result
+    return result
+  }
+}
+
+slow = cachingDecorator(slow)
+
+alert(slow(1)) // slow(1) is cached and the result returned
+alert("Again: " + slow(1)) // slow(1) result returned from cache
+
+alert(slow(2)) // slow(2) is cached and the result returned
+alert("Again: " + slow(2)) // slow(2) result returned from cache
+```
+
+`cachingDecorator` is a _decorator_, a special fn that takes another fn and alters its behavior.
+The idea is that we can call `cachingDecorator` for any fn, and it will return the caching wrapper.
+
+Why `cachingDecorator` is as a wrapper is better than adding the caching logic inside `slow()`:
+
+- The cachingDecorator is reusable. We can apply it to another function.
+- The caching logic is separate, it did not increase the complexity of slow itself (if there was any).
+- We can combine multiple decorators if needed (other decorators will follow).
+
+### **Using "func.call" for the context**
+
+The caching decorator above is not suited to work with object methods.
+
+For example:
+
+```js
+// we'll make worker.slow caching
+let worker = {
+  someMethod() {
+    return 1
+  },
+
+  slow(x) {
+    // scary CPU-heavy task here
+    alert("Called with " + x)
+    return x * this.someMethod() // (*)
+  },
+}
+
+// same code as before
+function cachingDecorator(func) {
+  let cache = new Map()
+  return function (x) {
+    if (cache.has(x)) {
+      return cache.get(x)
+    }
+    let result = func(x) // (**)
+    cache.set(x, result)
+    return result
+  }
+}
+
+alert(worker.slow(1)) // the original method works
+
+worker.slow = cachingDecorator(worker.slow) // now make it caching
+
+alert(worker.slow(2)) // Whoops! Error: Cannot read property 'someMethod' of undefined
+```
+
+The error occurs in the line `(*)` that tries to access `this.someMethod` and fails.
+
+The reason is that the wrapper calls the original function as `func(x)` in the line `(**)`. And, when called like that, the function gets `this = undefined`. The wrapper passes the call to the original method, but w/o the context `this`.
+
+To fix, there's a special built-in fn method [func.call(context, ...args)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call) that allows to call a fn explicitiy setting `this`.
+
+It runs `func` providing the first argument as `this`, and the next as the arguments.
+
+These are the same:
+
+```js
+func(1, 2, 3)
+func.call(obj, 1, 2, 3)
+```
+
+Only diff is that `func.call` sets `this` to `obj`.
+
+To fix broken example:
+
+```js
+let result = func.call(this, x) // "this" is passed correctly now
+```
+
+### **Going multi-argument**
+
+```js
+let worker = {
+  slow(min, max) {
+    alert(`Called with ${min},${max}`)
+    return min + max
+  },
+}
+
+function cachingDecorator(func, hash) {
+  let cache = new Map()
+  return function () {
+    let key = hash(arguments) // (*)
+    if (cache.has(key)) {
+      return cache.get(key)
+    }
+
+    let result = func.call(this, ...arguments) // (**)
+
+    cache.set(key, result)
+    return result
+  }
+}
+
+function hash(args) {
+  return args[0] + "," + args[1]
+}
+
+worker.slow = cachingDecorator(worker.slow, hash)
+
+alert(worker.slow(3, 5)) // works
+alert("Again " + worker.slow(3, 5)) // same (cached)
+```
+
+#### **func.apply**
+
+Instead of `func.call(this, ...arguments)` we could use `func.apply(this, arguments)`.
+
+`arguments` is an array-like object. Only diff b/w `call` and `apply` is that `call` expects a list of arguments, while `apply` takes an array-like object.
+
+These are the same:
+
+```js
+func.call(context, ...args) // pass an array as list with spread syntax
+func.apply(context, args) // is same as using call
+```
+
+#### **Borrowing a method**
+
+Improve hashing fn from above by
+
+```js
+// old hashing fn
+function hash(args) {
+  return args[0] + "," + args[1]
+  // return args.join() doesn't work because arguments object is both iterable and array-like, but not a real array.
+}
+
+// new hashing fn
+function hash() {
+  alert([].join.call(arguments)) // 1,2
+}
+
+hash(1, 2)
+```
+
+We borrow a join method from a regular array (`[].join`) and use `[].join.call`. The internal algorithm `arr.join(glue)`.
+
+1. Let `glue` be the first argument or, if no arguments, then a comma ",".
+2. Let `result` be an empty string.
+3. Append `this[0]` to `result`.
+4. Append `glue` and `this[1]`.
+5. Append `glue` and `this[2]`.
+6. …Do so until this.length items are glued.
+7. Return result.
+
+So, technically it takes `this` and joins `this[0]`, `this[1]` …etc together. It’s intentionally written in a way that allows any array-like `this` (not a coincidence, many methods follow this practice). That’s why it also works with `this=arguments`.
+
+### **Decorators and function properties**
+
+It is generally safe to replace a function or a method with a decorated one, except for one little thing. If the original function had properties on it, like func.calledCount or whatever, then the decorated one will not provide them. Because that is a wrapper. So one needs to be careful if one uses them.
+
+E.g. in the example above if `slow` function had any properties on it, then `cachingDecorator(slow)` is a wrapper without them.
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
