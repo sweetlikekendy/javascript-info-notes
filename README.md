@@ -154,14 +154,18 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**func.apply**](#funcapply)
       - [**Borrowing a method**](#borrowing-a-method)
     - [**Decorators and function properties**](#decorators-and-function-properties)
-  - [**Error Handling**](#error-handling)
+  - [**Function binding**](#function-binding)
     - [**Losing "this"**](#losing-this)
     - [**Solution 1: a wrapper**](#solution-1-a-wrapper)
     - [**Solution 2: bind**](#solution-2-bind)
       - [**Convenience method: `bindAll`**](#convenience-method-bindall)
     - [**Partial fns**](#partial-fns)
     - [**Going partial without context**](#going-partial-without-context)
-  - [**Function binding**](#function-binding)
+  - [**Arrow fns revisited**](#arrow-fns-revisited)
+    - [**Arrow fns have no this**](#arrow-fns-have-no-this)
+      - [**Arrow fns vs bindk**](#arrow-fns-vs-bindk)
+    - [**Arrow have no "arguments"**](#arrow-have-no-arguments)
+  - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
     - [**Optional "catch" binding**](#optional-catch-binding)
@@ -2304,7 +2308,7 @@ It is generally safe to replace a function or a method with a decorated one, exc
 
 E.g. in the example above if `slow` function had any properties on it, then `cachingDecorator(slow)` is a wrapper without them.
 
-## **[Error Handling](https://javascript.info/error-handling)**
+## **[Function binding](https://javascript.info/bind)**
 
 ### **Losing "this"**
 
@@ -2446,7 +2450,48 @@ user.sayNow("Hello")
 
 lodash [`_.partial`](https://lodash.com/docs#partial)
 
-## **[Function binding](https://javascript.info/bind)**
+## **Arrow fns revisited**
+
+### **Arrow fns have no this**
+
+If `this` is accessed, it is taken from the outside.
+
+#### **Arrow fns vs bindk**
+
+- `.bind(this)`creates "bound version of the function
+- Arrow doesn't create any binding. The lookup of `this` is made exactly the same way as a regular variable search: in the outer LE.
+
+### **Arrow have no "arguments"**
+
+```js
+function defer(f, ms) {
+  return function () {
+    setTimeout(() => f.apply(this, arguments), ms)
+  }
+}
+
+function sayHi(who) {
+  alert("Hello, " + who)
+}
+
+let sayHiDeferred = defer(sayHi, 2000)
+sayHiDeferred("John") // Hello, John after 2 seconds
+```
+
+The same without arrow fns
+
+```js
+function defer(f, ms) {
+  return function (...args) {
+    let ctx = this
+    setTimeout(function () {
+      return f.apply(ctx, args)
+    }, ms)
+  }
+}
+```
+
+## **[Error Handling](https://javascript.info/error-handling)**
 
 ### **[Try...catch](https://javascript.info/try-catch)**
 
