@@ -43,14 +43,14 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**forEach**](#foreach)
   - [**Searching in array**](#searching-in-array-1)
     - [**`indexOf`/`lastIndexOf` and includes**](#indexoflastindexof-and-includes)
-    - [**`find` and `findIndex`**](#find-and-findindex)
+    - [\*\*`find` and `findIndex`\*\*](#find-and-findindex)
     - [**`filter`**](#filter)
   - [**Transform an array**](#transform-an-array)
     - [**`map`**](#map)
     - [**`sort(fn)`**](#sortfn)
     - [**`reverse`**](#reverse)
-    - [**`split`** and **`join`**](#split-and-join)
-    - [**`reduce`**/**`reduceRight`**](#reducereduceright)
+    - [**`split` and `join`**](#split-and-join)
+    - [**`reduce`/`reduceRight`**](#reducereduceright)
     - [**`Array.isArray(value)`**](#arrayisarrayvalue)
     - [**Most methods support "thisArg"**](#most-methods-support-thisarg)
   - [**Iterables**](#iterables)
@@ -76,22 +76,22 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Nested Destructuring**](#nested-destructuring)
       - [**Smart function parameters**](#smart-function-parameters)
     - [**Data and time**](#data-and-time)
-      - [`new Date(milliseconds)`](#new-datemilliseconds)
-      - [`new Date(datestring)`](#new-datedatestring)
-      - [`new Date(year, month, date, hours, minutes, seconds, ms)`](#new-dateyear-month-date-hours-minutes-seconds-ms)
+      - [**`new Date(milliseconds)`**](#new-datemilliseconds)
+      - [**`new Date(datestring)`**](#new-datedatestring)
+      - [**`new Date(year, month, date, hours, minutes, seconds, ms)`**](#new-dateyear-month-date-hours-minutes-seconds-ms)
     - [**Access date components**](#access-date-components)
-      - [`getFullYear()`](#getfullyear)
-      - [`getMonth()`](#getmonth)
-      - [`getDate()`](#getdate)
-      - [`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`](#gethours-getminutes-getseconds-getmilliseconds)
-      - [`getDay()`](#getday)
-      - [`getTime()`](#gettime)
-      - [`getTimezoneOffset()`](#gettimezoneoffset)
+      - [\*\*`getFullYear()`\*\*](#getfullyear)
+      - [\*\*`getMonth()`\*\*](#getmonth)
+      - [\*\*`getDate()`\*\*](#getdate)
+      - [**`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`**](#gethours-getminutes-getseconds-getmilliseconds)
+      - [**`getDay()`**](#getday)
+      - [**`getTime()`**](#gettime)
+      - [**`getTimezoneOffset()`**](#gettimezoneoffset)
     - [**Autocorrection**](#autocorrection)
     - [**Date to number, date diff**](#date-to-number-date-diff)
     - [**Date.now()**](#datenow)
     - [**Benchmarking**](#benchmarking)
-    - [**`Date.parse` from a string**](#dateparse-from-a-string)
+    - [\*\*`Date.parse` from a string\*\*](#dateparse-from-a-string)
   - [**JSON methods**](#json-methods)
     - [**`JSON.stringify`**](#jsonstringify)
     - [**Excluding and transforming: replacer**](#excluding-and-transforming-replacer)
@@ -109,7 +109,7 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**The execution context and stack**](#the-execution-context-and-stack)
       - [**Recursive traversals**](#recursive-traversals)
       - [**Recursive structures**](#recursive-structures)
-        - [**Linked List**](#linked-list)
+      - [**# Linked List**](#-linked-list)
     - [**Rest parameters and spread syntax**](#rest-parameters-and-spread-syntax)
       - [**Rest parameters `...`**](#rest-parameters-)
       - [**The “arguments” variable**](#the-arguments-variable)
@@ -117,11 +117,11 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Copy an array/object**](#copy-an-arrayobject)
     - [**Variable scope, closure**](#variable-scope-closure)
       - [**Lexical Environment**](#lexical-environment)
-        - [**1. Variables**](#1-variables)
-        - [**2. Function Declarations**](#2-function-declarations)
-        - [**3. Inner and outer LE**](#3-inner-and-outer-le)
-        - [**4. Returning a function**](#4-returning-a-function)
-        - [Closure](#closure)
+      - [**# 1. Variables**](#-1-variables)
+      - [**# 2. Function Declarations**](#-2-function-declarations)
+      - [**# 3. Inner and outer LE**](#-3-inner-and-outer-le)
+      - [**# 4. Returning a function**](#-4-returning-a-function)
+      - [**# Closure**](#-closure)
     - [**Garbage Collection**](#garbage-collection-1)
       - [**Real-life optimizations**](#real-life-optimizations)
   - [**The old "var"**](#the-old-var)
@@ -140,7 +140,7 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**`delay`**](#delay)
       - [**`arg1, arg2`...**](#arg1-arg2)
       - [**Pass a fn, but don't run it**](#pass-a-fn-but-dont-run-it)
-      - [`Canceling with clearTimeout`](#canceling-with-cleartimeout)
+      - [**`Canceling with clearTimeout`**](#canceling-with-cleartimeout)
     - [**setInterval**](#setinterval)
       - [**Time goes on while `alert` is shown**](#time-goes-on-while-alert-is-shown)
     - [**Nested timeout**](#nested-timeout)
@@ -155,13 +155,20 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**Borrowing a method**](#borrowing-a-method)
     - [**Decorators and function properties**](#decorators-and-function-properties)
   - [**Error Handling**](#error-handling)
+    - [**Losing "this"**](#losing-this)
+    - [**Solution 1: a wrapper**](#solution-1-a-wrapper)
+    - [**Solution 2: bind**](#solution-2-bind)
+      - [**Convenience method: `bindAll`**](#convenience-method-bindall)
+    - [**Partial fns**](#partial-fns)
+    - [**Going partial without context**](#going-partial-without-context)
+  - [**Function binding**](#function-binding)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
     - [**Optional "catch" binding**](#optional-catch-binding)
     - [**Error Object**](#error-object-1)
-      - [`name`](#name)
-      - [`message`](#message)
-      - [`stack`](#stack)
+      - [**`name`**](#name)
+      - [**`message`**](#message)
+      - [**`stack`**](#stack)
     - [**"Throw" operator**](#throw-operator)
     - [**Rethrowing**](#rethrowing)
     - [**try…catch…finally**](#trycatchfinally)
@@ -648,7 +655,7 @@ alert(arr.indexOf(NaN)) // -1 (should be 0, but === equality doesn't work for Na
 alert(arr.includes(NaN)) // true (correct)
 ```
 
-### **[`find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find) and `findIndex`**
+### **[`find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/**Arrafind) and `findIndex`\*\*
 
 ```js
 let result = arr.find(function (item, index, array) {
@@ -672,7 +679,7 @@ alert(user.name) // John
 
 - [`arr.findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)) returns the index where the element was found instead of the element. Returns `-1` if nothing is found
 
-### **[`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)**
+### **[`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/filter)**
 
 Used if there are more than one instance in an array. Returns an array of all matching elements
 
@@ -698,7 +705,7 @@ alert(someUsers.length) // 2
 
 ## **Transform an array**
 
-### **[`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)**
+### **[`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Arramap)**
 
 ```js
 let result = arr.map(function (item, index, array) {
@@ -706,7 +713,7 @@ let result = arr.map(function (item, index, array) {
 })
 ```
 
-### **[`sort(fn)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)**
+### **[`sort(fn)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/sort)**
 
 All elements are converted to strings during compare.
 
@@ -721,11 +728,11 @@ let countries = ["Österreich", "Andorra", "Vietnam"]
 alert(countries.sort((a, b) => a.localeCompare(b))) // Andorra,Österreich,Vietnam (correct!)
 ```
 
-### **[`reverse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)**
+### **[`reverse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/reverse)**
 
-### **`split`** and **`join`**
+### **`split` and `join`**
 
-**[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)** and **[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
+**[split](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/split)[join](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**
 
 ```js
 // Split example
@@ -752,9 +759,9 @@ let str = arr.join(";") // glue the array into a string using ;
 alert(str) // Bilbo;Gandalf;Nazgul
 ```
 
-### **`reduce`**/**`reduceRight`**
+### **`reduce`/`reduceRight`**
 
-**[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)**/**[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
+**[reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)[reduceRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)**
 
 Used to calculate a single value based on the array.
 
@@ -767,7 +774,7 @@ let value = arr.reduce(
 )
 ```
 
-### **[`Array.isArray(value)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/isArray)**
+### **[`Array.isArray(value)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/ReferencGlobal_ObjectArray/isArray)**
 
 To check if array or not. Returns `true` or `false`.
 
@@ -815,7 +822,7 @@ for (let num of range) {
 
 Array-likes: objects that have indexes and `length`, so they look like arrays.
 
-### **[Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)**
+### **[Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectArray/from)**
 
 Takes an iterable or array-like value and makes a "real" `Array` from it.
 
@@ -1147,17 +1154,17 @@ showMenu() // Menu 100 200
 
 ### **[Data and time](https://javascript.info/date)**
 
-#### `new Date(milliseconds)`
+#### **`new Date(milliseconds)`**
 
 An integer number representing the number of milliseconds that has passed since the beginning of 1970 is called a timestamp.
 
 Dates before 01.01.1970 have negative timestamps
 
-#### `new Date(datestring)`
+#### **`new Date(datestring)`**
 
 If there is a single argument, and it’s a string, then it is parsed automatically. Uses `Date.parse`.
 
-#### `new Date(year, month, date, hours, minutes, seconds, ms)`
+#### **`new Date(year, month, date, hours, minutes, seconds, ms)`**
 
 - The `year` must have 4 digits: `2013` is okay, `98` is not.
 - The `month` count starts with `0` (Jan), up to `11` (Dec).
@@ -1174,26 +1181,26 @@ alert(date) // 1.01.2011, 02:03:04.567
 
 ### **Access date components**
 
-#### [`getFullYear()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getFullYear)
+#### **[`getFullYear()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/**Global_Objects/Date/getFullYear)\*\*
 
 Get the year (4 digits)
 
-#### [`getMonth()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth)
+#### **[`getMonth()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/**Date/getMonth)\*\*
 
 Get the month, from 0 to 11.
 
-#### [`getDate()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDate)
+#### **[`getDate()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/**Date/getDate)\*\*
 
 Get the day of month, from 1 to 31, the name of the method does look a little bit strange.
 
-#### `getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`
+#### **`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`**
 
 Mdn links:
 [`getHours()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getHours), [`getMinutes()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMinutes), [`getSeconds()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getSeconds), [`getMilliseconds()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMilliseconds)
 
 Get the corresponding time components.
 
-#### [`getDay()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay)
+#### **[`getDay()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay)**
 
 Get the day of week, from 0 (Sunday) to 6 (Saturday). The first day is always Sunday, in some countries that’s not so, but can’t be changed.
 
@@ -1201,11 +1208,11 @@ Get the day of week, from 0 (Sunday) to 6 (Saturday). The first day is always Su
 
 No UTC-variant:
 
-#### [`getTime()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)
+#### **[`getTime()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)**
 
 Returns the timestamp for the date – a number of milliseconds passed from the January 1st of 1970 UTC+0.
 
-#### [`getTimezoneOffset()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset)
+#### **[`getTimezoneOffset()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset)**
 
 Returns the difference between UTC and the local time zone, in minutes:
 
@@ -1260,7 +1267,7 @@ alert("Total time for diffSubtract: " + time1)
 alert("Total time for diffGetTime: " + time2)
 ```
 
-### **[`Date.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse) from a string**
+### **[`Date.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/**Global_ObjectDate/parse) from a string\*\*
 
 `YYYY-MM-DDTHH:mm:ss.sssZ` returns the timestamp
 
@@ -1489,7 +1496,7 @@ HTML document, an HTML-tag may contain a list of:
 - HTML-comments.
 - Other HTML-tags (that in turn may contain text pieces/comments or other tags etc).
 
-##### **Linked List**
+#### **# Linked List**
 
 ### **[Rest parameters and spread syntax](https://javascript.info/rest-parameters-spread)**
 
@@ -1542,7 +1549,7 @@ alert(obj === objCopy) // false (not same reference)
 
 #### **Lexical Environment**
 
-##### **1. Variables**
+#### **# 1. Variables**
 
 In JS, there is an internal (hidden) associated object known as the _Lexical Environment_.
 
@@ -1555,7 +1562,7 @@ Lexical Environment (LE) consists of 2 parts:
 
 ![Variable in lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/variable-initialization.png)
 
-##### **2. Function Declarations**
+#### **# 2. Function Declarations**
 
 Function declaration is instantally fully initialized.
 
@@ -1563,7 +1570,7 @@ Function declaration is instantally fully initialized.
 
 This only happens with function declarations and not function expressions such as `let say = function(name)...`.
 
-##### **3. Inner and outer LE**
+#### **# 3. Inner and outer LE**
 
 When a function runs, at the beginning of the call, a new LE is created automatically to store local variables and parameters of the call.
 
@@ -1579,7 +1586,7 @@ If a variable is not found anywhere, that’s an error in strict mode (without u
 
 ![Inner and outer variable access lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/inner-outer-variable-access.png)
 
-##### **4. Returning a function**
+#### **# 4. Returning a function**
 
 ```js
 function makeCounter() {
@@ -1613,7 +1620,7 @@ When code inside `counter()` looks for `count` variable, it searches its own LE.
 
 ![Function returns 4 lexical environment](6-advanced_working_with_functions/images/variable-scope-closure/function-returns-lexical-environment-4.png)
 
-##### Closure
+#### **# Closure**
 
 A closure is a function that remembers its outer variables and can access them. In JS, all fns are naturally closures. Fns automatically remember where they were created using a hidden `[[Enviroment]]` property, and then their code can access outer variables.
 
@@ -1999,7 +2006,7 @@ setTimeout(sayHi(), 1000) // wrong!
 
 `setTimeout` expects a reference to a fn. `sayHi()` runs the fn and the result of its execution is passed to `setTimeout`.
 
-#### `Canceling with clearTimeout`
+#### **`Canceling with clearTimeout`**
 
 `setTimeout` returns a `timerId` that we can use to cancel the execution.
 
@@ -2299,6 +2306,148 @@ E.g. in the example above if `slow` function had any properties on it, then `cac
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
+### **Losing "this"**
+
+Once a method is passed somewhere separately from the object - `this` is lost.
+
+```js
+let user = {
+  firstName: "John",
+  sayHi() {
+    alert(`Hello, ${this.firstName}!`)
+  },
+}
+
+setTimeout(user.sayHi, 1000) // Hello, undefined!
+```
+
+### **Solution 1: a wrapper**
+
+```js
+setTimeout(function () {
+  user.sayHi() // Hello, John!
+}, 1000)
+```
+
+Works now because it receives `user` from the outer LE, then calls the method normally. But the solution is not good enough. What if there's a 1 sec delay?
+
+```js
+setTimeout(() => user.sayHi(), 1000)
+
+// ...the value of user changes within 1 second
+user = {
+  sayHi() {
+    alert("Another user in setTimeout!")
+  },
+}
+
+// Another user in setTimeout!
+```
+
+### **Solution 2: bind**
+
+[mdn link](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
+
+```js
+func.bind(context)
+```
+
+`this=context`
+
+```js
+let user = {
+  firstName: "John",
+}
+
+function func() {
+  alert(this.firstName)
+}
+
+let funcUser = func.bind(user) // this=user
+funcUser() // John
+
+/*
+All arguments are passed to the original func "as is"
+*/
+funcUser("Hello") // Hello, John (argument "Hello" is passed, and this=user)
+```
+
+#### **Convenience method: `bindAll`**
+
+If an object has many methods and we plan to actively pass it around, then we could bind them all in a loop:
+
+```js
+for (let key in user) {
+  if (typeof user[key] == "function") {
+    user[key] = user[key].bind(user)
+  }
+}
+```
+
+lodash lib has a fn: [`_.bindAll(object, methodNames)`](http://lodash.com/docs#bindAll)
+
+### **Partial fns**
+
+Bind arguments. Allows to bind context as `this` and starting arguments of the fn.
+
+```js
+let bound = func.bind(context, [arg1], [arg2], ...);
+```
+
+```js
+function mul(a, b) {
+  return a * b
+}
+
+// We don't actually use this here, but bind requires it so we use null.
+let double = mul.bind(null, 2)
+
+alert(double(3)) // = mul(2, 3) = 6
+alert(double(4)) // = mul(2, 4) = 8
+alert(double(5)) // = mul(2, 5) = 10
+```
+
+Bound argument is the first argument.
+
+Benefit of partial fn is that we can create an independent fn w/ a readable name (`double`, `triple`). We can use it and not provide the first argument every time. For instance, we have a function `send(from, to, text)`. Then, inside a `user` object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
+
+### **Going partial without context**
+
+```js
+function partial(func, ...argsBound) {
+  return function (...args) {
+    // (*)
+    return func.call(this, ...argsBound, ...args)
+  }
+}
+
+// Usage:
+let user = {
+  firstName: "John",
+  say(time, phrase) {
+    alert(`[${time}] ${this.firstName}: ${phrase}!`)
+  },
+}
+
+// add a partial method with fixed time
+user.sayNow = partial(
+  user.say,
+  new Date().getHours() + ":" + new Date().getMinutes()
+)
+
+user.sayNow("Hello")
+// Something like:
+// [10:00] John: Hello!
+```
+
+- Same `this` as it gets (for `user.sayNow` call it’s `user`)
+- Then gives it `...argsBound` – arguments from the `partial` call (`"10:00"`)
+- Then gives it `...args` – arguments given to the wrapper (`"Hello"`)
+
+lodash [`_.partial`](https://lodash.com/docs#partial)
+
+## **[Function binding](https://javascript.info/bind)**
+
 ### **[Try...catch](https://javascript.info/try-catch)**
 
 ![Try catch flow diagram](10-error_handling/images/try-catch/try-catch-flow.png)
@@ -2320,16 +2469,16 @@ If we don't need error details, `catch` may be omitted.
 
 ### **Error Object**
 
-#### `name`
+#### **`name`**
 
 Error name. For instance, for an undefined variable that’s "ReferenceError".
 
-#### `message`
+#### **`message`**
 
 Textual message about error details.
 There are other non-standard properties available in most environments. One of most widely used and supported is:
 
-#### `stack`
+#### **`stack`**
 
 Current call stack: a string with information about the sequence of nested calls that led to the error. Used for debugging purposes.
 
