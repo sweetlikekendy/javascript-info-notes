@@ -175,6 +175,10 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Object.getOwnPropertyDescriptoprs**](#objectgetownpropertydescriptoprs)
     - [**Sealing an object globally**](#sealing-an-object-globally)
   - [**Property getters and setters**](#property-getters-and-setters)
+    - [**Getters and setters**](#getters-and-setters)
+    - [**Accessor descriptors**](#accessor-descriptors)
+    - [**Smarter getters/setters**](#smarter-getterssetters)
+    - [**Using for compatiability**](#using-for-compatiability)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -2664,7 +2668,83 @@ Property descriptors work at the level of individiual properties. There are also
 
 ## **[Property getters and setters](https://javascript.info/property-accessors)**
 
-There are two kinds of object properties.
+There are two kinds of object properties: data and accessor. Accessor are fns that execut on getting and setting a value.
+
+### **Getters and setters**
+
+Getter works when the property is read, setter when it is assigned.
+
+```js
+let obj = {
+  get propName() {
+    // getter, the code executed on getting obj.propName
+  },
+
+  set propName(value) {
+    // setter, the code executed on setting obj.propName = value
+  },
+}
+```
+
+If you try to get or set without the proper property defined in an obj, you will receive an error.
+
+### **Accessor descriptors**
+
+Accessor descriptors may have:
+
+- **`get`** – a function without arguments, that works when a property is read,
+- **`set`** – a function with one argument, that is called when the property is set,
+- **`enumerable`** – same as for data properties,
+- **`configurable`** – same as for data properties.
+
+### **Smarter getters/setters**
+
+Getter/setters can be used as wrappers over "real" property values to gain more control over operations with them.
+
+```js
+let user = {
+  get name() {
+    return this._name
+  },
+
+  set name(value) {
+    if (value.length < 4) {
+      alert("Name is too short, need at least 4 characters")
+      return
+    }
+    this._name = value
+  },
+}
+
+user.name = "Pete"
+alert(user.name) // Pete
+
+user.name = "" // Name is too short...
+```
+
+### **Using for compatiability**
+
+Say we have a `user` obj that first had an `age` property. Then, instead of age, we wanted to know the user's birthday. Since most of the time, we ask for a user's birthday to calculate their age. We can add a getter for `age`.
+
+```js
+function User(name, birthday) {
+  this.name = name
+  this.birthday = birthday
+
+  // age is calculated from the current date and birthday
+  Object.defineProperty(this, "age", {
+    get() {
+      let todayYear = new Date().getFullYear()
+      return todayYear - this.birthday.getFullYear()
+    },
+  })
+}
+
+let john = new User("John", new Date(1992, 6, 1))
+
+alert(john.birthday) // birthday is available
+alert(john.age) // ...as well as the age
+```
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
