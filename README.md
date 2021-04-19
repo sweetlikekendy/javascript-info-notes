@@ -165,6 +165,16 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Arrow fns have no this**](#arrow-fns-have-no-this)
       - [**Arrow fns vs bindk**](#arrow-fns-vs-bindk)
     - [**Arrow have no "arguments"**](#arrow-have-no-arguments)
+- [**Object properties configuration**](#object-properties-configuration)
+  - [**Property flags and descriptors**](#property-flags-and-descriptors)
+    - [**Property flags**](#property-flags)
+    - [**Non-writable**](#non-writable)
+    - [Non-enumerable](#non-enumerable)
+    - [**Non-configurable**](#non-configurable)
+    - [**Obnect.defineProperties**](#obnectdefineproperties)
+    - [**Object.getOwnPropertyDescriptoprs**](#objectgetownpropertydescriptoprs)
+    - [**Sealing an object globally**](#sealing-an-object-globally)
+  - [**Property getters and setters**](#property-getters-and-setters)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -2491,6 +2501,171 @@ function defer(f, ms) {
 }
 ```
 
+# **[Object properties configuration](https://javascript.info/object-properties)**
+
+## **[Property flags and descriptors](https://javascript.info/property-descriptors)**
+
+### **Property flags**
+
+3 special attributes:
+
+- `writable` - if `true`, the value can be changed, otherwise it's read-only
+- `enumerable` – if `true`, then listed in loops, otherwise not listed.
+- `configurable` – if `true`, the property can be deleted and these attributes can be modified, otherwise not.
+
+To get flags:
+
+```js
+let descriptor = Object.getOwnPropertyDescriptor(obj, propertyName)
+```
+
+[Object.getOwnPropertyDescriptor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor)
+
+`obj` - the object to get info from
+
+`propertyName` - name of the property
+
+```````js
+let user = {
+  name: "John",
+}
+
+let descriptor = Object.getOwnPropertyDescriptor(user, "name")
+
+alert(JSON.stringify(descriptor, null, 2))
+/* property descriptor:``````
+{
+  "value": "John",
+  "writable": true,
+  "enumerable": true,
+  "configurable": true
+}
+*/
+```````
+
+To change flags: [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
+
+```js
+Object.defineProperty(obj, propertyName, descriptor)
+```
+
+`obj`, `propertyName` - same as `Object.getOwnPropertyDescriptor`.
+
+`descriptor` - Property descriptor object to apply.
+
+If property exists, it'll be updated, otherwise the flags will return false.
+
+```js
+let user = {}
+
+Object.defineProperty(user, "name", {
+  value: "John",
+})
+
+let descriptor = Object.getOwnPropertyDescriptor(user, "name")
+
+alert(JSON.stringify(descriptor, null, 2))
+/*
+{
+  "value": "John",
+  "writable": false,
+  "enumerable": false,
+  "configurable": false
+}
+ */
+```
+
+### **Non-writable**
+
+```js
+let user = {
+  name: "John",
+}
+
+Object.defineProperty(user, "name", {
+  writable: false,
+})
+
+user.name = "Pete" // Error: Cannot assign to read only property 'name'
+```
+
+Can only be changed if they apply their own `definteProperty` to override.
+
+### Non-enumerable
+
+Normally a built-in `toString` is non-enumerable. It won't show up in `for..in`. However, a custom one will.
+
+```js
+let user = {
+  name: "John",
+  toString() {
+    return this.name
+  },
+}
+
+// By default, both our properties are listed:
+for (let key in user) alert(key) // name, toString
+```
+
+To not let it show in `for..in`, set `enumerable: false`. They are also not shown in `Object.keys`
+
+```js
+Object.defineProperty(user, "toString", {
+  enumerable: false;
+})
+```
+
+### **Non-configurable**
+
+A non-configurable property cannot be deleted. `Math.PI` is non-writable, non-enumerable and non-configurable.
+
+Making a property non-configurable is a one-way road. You cannot change it back with `defineProperty`.
+
+1. Can’t change configurable flag.
+2. Can’t change enumerable flag.
+3. Can’t change writable: false to true (the other way round works).
+4. Can’t change get/set for an accessor property (but can assign them if absent).
+
+The idea of “configurable: false” is to prevent changes of property flags and its deletion, while allowing to change its value.
+
+### **Obnect.defineProperties**
+
+Allows to define many properties at once. [`Object.defineProperties(obj,descriptors)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperties)
+
+```js
+Object.defineProperties(obj, {
+  prop1: descriptor1,
+  prop2: descriptor2,
+  // ...
+})
+
+Object.defineProperties(user, {
+  name: { value: "John", writable: false },
+  surname: { value: "Smith", writable: false },
+  // ...
+})
+```
+
+### **Object.getOwnPropertyDescriptoprs**
+
+Get all property descriptors at once, [`Object.getOwnPropertyDescriptors(obj)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptors)
+
+Can be used as a "flags-aware" way of cloning an object:
+
+```js
+let clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(obj))
+```
+
+Another difference is that `for..in` ignores symbolic properties, but `Object.getOwnPropertyDescriptors` returns all property descriptors including symbolic ones.
+
+### **Sealing an object globally**
+
+Property descriptors work at the level of individiual properties. There are also methods that limit access to the whole object. Click [here](https://javascript.info/property-descriptors#sealing-an-object-globally) for more.
+
+## **[Property getters and setters](https://javascript.info/property-accessors)**
+
+There are two kinds of object properties.
+
 ## **[Error Handling](https://javascript.info/error-handling)**
 
 ### **[Try...catch](https://javascript.info/try-catch)**
@@ -2619,3 +2794,7 @@ They work like this:
 4. We can log in to the service web interface and see errors.
 
 ## **[Custom errors, extending Error](https://javascript.info/custom-errors)**
+
+```
+
+```
