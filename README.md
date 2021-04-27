@@ -2,9 +2,10 @@
 
 My notes from the [javascript.info](https://javascript.info) website.
 
-**Table of Contents**
+# **Table of Contents**
 
 - [Javascript.info Notes](#javascriptinfo-notes)
+- [**Table of Contents**](#table-of-contents)
 - [**Objects**](#objects)
   - [**Object references and copying**](#object-references-and-copying)
   - [**Garbage Collection**](#garbage-collection)
@@ -179,6 +180,22 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Accessor descriptors**](#accessor-descriptors)
     - [**Smarter getters/setters**](#smarter-getterssetters)
     - [**Using for compatiability**](#using-for-compatiability)
+- [**Prototypes, inheritance**](#prototypes-inheritance)
+  - [**Prototypal inheritance**](#prototypal-inheritance)
+    - [**[[Prototype]]**](#prototype)
+      - [**`__proto__` is a historical getter/setter for `[[Prototype]]`**](#__proto__-is-a-historical-gettersetter-for-prototype)
+    - [**Writing doesn't use prototype**](#writing-doesnt-use-prototype)
+    - [**The value of "this"**](#the-value-of-this)
+    - [**for...in loop**](#forin-loop)
+  - [**F.prototype**](#fprototype)
+    - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
+    - [**Default F.prototype, constructor property**](#default-fprototype-constructor-property)
+  - [**Native prototypes**](#native-prototypes)
+    - [**Object.prototype**](#objectprototype)
+    - [**Other built-in prototypes**](#other-built-in-prototypes)
+    - [**Primitive**](#primitive)
+    - [**Changing native prototypes**](#changing-native-prototypes)
+    - [**Borrowing from prototypes**](#borrowing-from-prototypes)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -2744,6 +2761,384 @@ let john = new User("John", new Date(1992, 6, 1))
 
 alert(john.birthday) // birthday is available
 alert(john.age) // ...as well as the age
+```
+
+# **[Prototypes, inheritance](https://javascript.info/prototypes)**
+
+## **[Prototypal inheritance](https://javascript.info/prototype-inheritance)**
+
+### **[[Prototype]]**
+
+Objects have special hidden property `[[Prototype]]` that is `null` or references another object.
+
+It is usually hidden, but you can use it with `__proto__`
+
+```js
+let animal = {
+  eats: true,
+}
+let rabbit = {
+  jumps: true,
+}
+
+rabbit.__proto__ = animal // sets rabbit.[[Prototype]] = animal
+```
+
+```js
+let animal = {
+  eats: true,
+}
+let rabbit = {
+  jumps: true,
+}
+
+rabbit.__proto__ = animal // (*)
+
+// we can find both properties in rabbit now:
+alert(rabbit.eats) // true (**)
+alert(rabbit.jumps) // true
+```
+
+If we have a method in `animal` it will be accessible in `rabbit`. You can chain multiple objects together.
+
+```js
+let animal = {
+  eats: true,
+  walk() {
+    alert("Animal walk")
+  },
+}
+
+let rabbit = {
+  jumps: true,
+  __proto__: animal,
+}
+
+let longEar = {
+  earLength: 10,
+  __proto__: rabbit,
+}
+
+// walk is taken from the prototype chain
+longEar.walk() // Animal walk
+alert(longEar.jumps) // true (from rabbit)
+```
+
+Two limitations:
+
+1. No circular references.
+2. The value of `__proto__` can be either an object or `null`. Other types are ignored.
+
+#### **`__proto__` is a historical getter/setter for `[[Prototype]]`**
+
+`__proto__` is a bit outdated. We should use `Object.getPrototypeOf`/`Object.setPrototypeOf`
+
+### **Writing doesn't use prototype**
+
+Prototype is only used for rerading properties.
+
+```js
+let animal = {
+  eats: true,
+  walk() {
+    /* this method won't be used by rabbit */
+  },
+}
+
+let rabbit = {
+  __proto__: animal,
+}
+
+rabbit.walk = function () {
+  alert("Rabbit! Bounce-bounce!")
+}
+
+rabbit.walk() // Rabbit! Bounce-bounce!
+```
+
+Accessor fns are an exception, as assignment is handled by a setter fn. So writing to such property is actually the same as calling a fn.
+
+```js
+let user = {
+  name: "John",
+  surname: "Smith",
+
+  set fullName(value) {
+    ;[this.name, this.surname] = value.split(" ")
+  },
+
+  get fullName() {
+    return `${this.name} ${this.surname}`
+  },
+}
+
+let admin = {
+  __proto__: user,
+  isAdmin: true,
+}
+
+alert(admin.fullName) // John Smith (*)
+
+// setter triggers!
+admin.fullName = "Alice Cooper" // (**)
+
+alert(admin.fullName) // Alice Cooper, state of admin modified
+alert(user.fullName) // John Smith, state of user protected
+```
+
+### **The value of "this"**
+
+Value of `this` inside `set fullName(value)`. `this` is not affected by protoypes at all. **No matter where the method is found: in an object or its protoype. In a method call, `this` is always the object before the dot.**
+
+So, the setter call `admin.fullName=` uses `admin` as `this`, not `user`.
+
+```js
+// animal has methods
+let animal = {
+  walk() {
+    if (!this.isSleeping) {
+      alert(`I walk`)
+    }
+  },
+  sleep() {
+    this.isSleeping = true
+  },
+}
+
+let rabbit = {
+  name: "White Rabbit",
+  __proto__: animal,
+}
+
+// modifies rabbit.isSleeping
+rabbit.sleep()
+
+alert(rabbit.isSleeping) // true
+alert(animal.isSleeping) // undefined (no such property in the prototype)
+```
+
+### **for...in loop**
+
+The `for...in` loops over inherited properties, too.
+
+```js
+let animal = {
+  eats: true,
+}
+
+let rabbit = {
+  jumps: true,
+  __proto__: animal,
+}
+
+// Object.keys only returns own keys
+alert(Object.keys(rabbit)) // jumps
+
+// for..in loops over both own and inherited keys
+for (let prop in rabbit) alert(prop) // jumps, then eats
+```
+
+To exclude inherited properties, use built-in method `obj.hasOwnProperty(key)`.
+
+```js
+let animal = {
+  eats: true,
+}
+
+let rabbit = {
+  jumps: true,
+  __proto__: animal,
+}
+
+for (let prop in rabbit) {
+  let isOwn = rabbit.hasOwnProperty(prop)
+
+  if (isOwn) {
+    alert(`Our: ${prop}`) // Our: jumps
+  } else {
+    alert(`Inherited: ${prop}`) // Inherited: eats
+  }
+}
+```
+
+Here we have the following inheritance chain: `rabbit` inherits from `animal`, that inherits from `Object.prototype` (because `animal` is a literal object `{...}`, so it’s by default), and then `null` above it:
+
+![Rabbit, animal, Object.prototype chart](8-protoypes-inheritance/rabbit-animal-object-prototype.png)
+
+`hasOwnProperty` does not appear in `for...in` loop because it's not enumerable. All properites of `Object.protoype` have `enumerable: false` flag.
+
+## **[F.prototype](https://javascript.info/function-prototype)**
+
+New objects can be created with a constructor function, like `new F()`. `F.prototype` is an object, then the `new` operator uses it to set `[[Prototype]]` for the new object.
+
+`F.prototype` means a regular property called `"prototype"` on `F`.
+
+```js
+let animal = {
+  eats: true,
+}
+
+function Rabbit(name) {
+  this.name = name
+}
+
+Rabbit.prototype = animal // "When a new Rabbit is created, assign its [[Prototype]] to animal".
+
+let rabbit = new Rabbit("White Rabbit") //  rabbit.__proto__ == animal
+
+alert(rabbit.eats) // true
+```
+
+![Rabbit.prototype = animal](8-protoypes-inheritance/f.prototype/rabbit-prototype.png)
+
+`"prototype"` is the horizonatal arrow, meaning a regular property, and `[[Prototype]]`is vertical, meaning the inheritance of `rabbit` and `animal`.
+
+#### **`F.prototype` only used at `new F` time**
+
+`F.prototype` property is only used when `new F` is called, it assigns `[[Prototype]]` of the new object.
+
+If, after the creation, `F.prototype` property changes (`F.prototype` = `<another object>`), then new objects created by `new F` will have another object as `[[Prototype]]`, but already existing objects keep the old one.
+
+### **Default F.prototype, constructor property**
+
+Every fn has the `"prototype"` property even if it's not supplied. The default `"prototype"` is an ojbect with the only property `constructor` that points back to the fn itself.
+
+```js
+function Rabbit() {}
+
+/* default prototype
+Rabbit.prototype = { constructor: Rabbit };
+*/
+
+alert(Rabbit.prototype.constructor == Rabbit) // true
+```
+
+If we do nothing, the `constructor` is available through all subsequent rabbits
+
+```jsfunction Rabbit() {}
+// by default:
+// Rabbit.prototype = { constructor: Rabbit }
+
+let rabbit = new Rabbit(); // inherits from {constructor: Rabbit}
+
+alert(rabbit.constructor == Rabbit); // true (from prototype)
+```
+
+```js
+function Rabbit(name) {
+  this.name = name
+  alert(name)
+}
+
+let rabbit = new Rabbit("White Rabbit")
+
+let rabbit2 = new rabbit.constructor("Black Rabbit")
+```
+
+The above is handy when we have an object, don't know which constrcutor was used for it (e.g. came from 3rd party lib), and we need to create another one of the same kind.
+
+**Javascript does not ensure the right `"constructor"` value**
+
+Default `"prototype"` exists for fns, but we can replace the default prototype as a whole, then there will be no `"constructor"` in it.
+
+```js
+function Rabbit() {}
+Rabbit.prototype = {
+  jumps: true,
+}
+
+let rabbit = new Rabbit()
+alert(rabbit.constructor === Rabbit) // false
+```
+
+To keep the right `"constructor"` we can choose to add/remove properties to default `"prototype"`
+
+```js
+function Rabbit() {}
+
+// Not overwrite Rabbit.prototype totally
+// just add to it
+Rabbit.prototype.jumps = true
+// the default Rabbit.prototype.constructor is preserved
+
+// or
+Rabbit.prototype = {
+  jumps: true,
+  constructor: Rabbit,
+}
+
+// no constructor is also correct, b/c we added it
+```
+
+## **[Native prototypes](https://javascript.info/native-prototypes)**
+
+### **Object.prototype**
+
+```js
+let obj = {} // obj = new Object()
+alert(obj) // "[object Object]" ?
+```
+
+`Object` with it's own `prototype` referencing an object w/ `toString` and other methods. When `new Object()` is called (or `{...}`), the `[[Prototype]]` of it is set to `Object.prototype`.
+
+![Object Prototype](8-protoypes-inheritance/native-prototype/object.prototype.png)
+
+`obj.toString()` is called the method is taken from `Object.prototype`.
+
+```jsx
+let obj = {}
+
+alert(obj.__proto__ === Object.prototype) // true
+
+alert(obj.toString === obj.__proto__.toString) //true
+alert(obj.toString === Object.prototype.toString) //true
+```
+
+### **Other built-in prototypes**
+
+`Array`, `Date`, `Function`
+
+When we create an array `[1,2,3]`, the default `new Array()` constructor is used internally. So `Array.prototype` becomes its prototype and provides methods.
+
+![Array, function, Number, and Object Prototypes](8-protoypes-inheritance/native-prototype/other-builtin-prototypes.png)
+
+```js
+let arr = [1, 2, 3]
+
+// it inherits from Array.prototype?
+alert(arr.__proto__ === Array.prototype) // true
+
+// then from Object.prototype?
+alert(arr.__proto__.__proto__ === Object.prototype) // true
+
+// and null on the top.
+alert(arr.__proto__.__proto__.__proto__) // null
+
+alert(arr) // 1,2,3 <-- The result of Array.prototype.toString
+```
+
+`Object.prototype` has toString as well, but `Array.prototype` is closer in the chain, so the array variant is used.
+
+### **Primitive**
+
+Primitives such as string, numbers, and booleans have temporary wrapper objects when we try to access their properties (`String`, `Number`, and `Boolean`). `String.prototype`, `Number.prototype`, and `Boolean.prototype`.
+
+### **Changing native prototypes**
+
+Native prototypes can be modified. **In modern programming, there is only one case where modifying native prototypes is approved. Polyfilling.**
+
+### **Borrowing from prototypes**
+
+```js
+let obj = {
+  0: "Hello",
+  1: "world!",
+  length: 2,
+}
+
+obj.join = Array.prototype.join
+
+alert(obj.join(",")) // Hello,world!
 ```
 
 ## **[Error Handling](https://javascript.info/error-handling)**
