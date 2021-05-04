@@ -44,7 +44,7 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**forEach**](#foreach)
   - [**Searching in array**](#searching-in-array-1)
     - [**`indexOf`/`lastIndexOf` and includes**](#indexoflastindexof-and-includes)
-    - [\*\*`find` and `findIndex`\*\*](#find-and-findindex)
+    - [**`find` and `findIndex`\*\*](#find-and-findindex)
     - [**`filter`**](#filter)
   - [**Transform an array**](#transform-an-array)
     - [**`map`**](#map)
@@ -81,9 +81,9 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**`new Date(datestring)`**](#new-datedatestring)
       - [**`new Date(year, month, date, hours, minutes, seconds, ms)`**](#new-dateyear-month-date-hours-minutes-seconds-ms)
     - [**Access date components**](#access-date-components)
-      - [\*\*`getFullYear()`\*\*](#getfullyear)
-      - [\*\*`getMonth()`\*\*](#getmonth)
-      - [\*\*`getDate()`\*\*](#getdate)
+      - [**`getFullYear()`\*\*](#getfullyear)
+      - [**`getMonth()`\*\*](#getmonth)
+      - [**`getDate()`\*\*](#getdate)
       - [**`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`**](#gethours-getminutes-getseconds-getmilliseconds)
       - [**`getDay()`**](#getday)
       - [**`getTime()`**](#gettime)
@@ -92,7 +92,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Date to number, date diff**](#date-to-number-date-diff)
     - [**Date.now()**](#datenow)
     - [**Benchmarking**](#benchmarking)
-    - [\*\*`Date.parse` from a string\*\*](#dateparse-from-a-string)
+    - [**`Date.parse` from a string\*\*](#dateparse-from-a-string)
   - [**JSON methods**](#json-methods)
     - [**`JSON.stringify`**](#jsonstringify)
     - [**Excluding and transforming: replacer**](#excluding-and-transforming-replacer)
@@ -188,7 +188,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**The value of "this"**](#the-value-of-this)
     - [**for...in loop**](#forin-loop)
   - [**F.prototype**](#fprototype)
-    - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
+      - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
     - [**Default F.prototype, constructor property**](#default-fprototype-constructor-property)
   - [**Native prototypes**](#native-prototypes)
     - [**Object.prototype**](#objectprototype)
@@ -196,6 +196,9 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Primitive**](#primitive)
     - [**Changing native prototypes**](#changing-native-prototypes)
     - [**Borrowing from prototypes**](#borrowing-from-prototypes)
+    - [**Borrowing from prototypes**](#borrowing-from-prototypes-1)
+  - [**Prototype methods, objects without **proto****](#prototype-methods-objects-without-proto)
+    - [**Very plain objects**](#very-plain-objects)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -2963,7 +2966,7 @@ for (let prop in rabbit) {
 
 Here we have the following inheritance chain: `rabbit` inherits from `animal`, that inherits from `Object.prototype` (because `animal` is a literal object `{...}`, so it’s by default), and then `null` above it:
 
-![Rabbit, animal, Object.prototype chart](8-protoypes-inheritance/rabbit-animal-object-prototype.png)
+![Rabbit, animal, Object.prototype chart](8-protoypes-inheritance/prototype-inheritance/rabbit-animal-object-prototype.png)
 
 `hasOwnProperty` does not appear in `for...in` loop because it's not enumerable. All properites of `Object.protoype` have `enumerable: false` flag.
 
@@ -3140,6 +3143,87 @@ obj.join = Array.prototype.join
 
 alert(obj.join(",")) // Hello,world!
 ```
+
+### **Borrowing from prototypes**
+
+Take a method from one object and copy it into another. Some methods of native protoypes are often borrowed.
+
+```js
+let obj = {
+  0: "Hello",
+  1: "world!",
+  length: 2,
+}
+
+obj.join = Array.prototype.join
+
+alert(obj.join(",")) // Hello,world!
+```
+
+## **[Prototype methods, objects without **proto**](https://javascript.info/prototype-methods)**
+
+Modern methods to create a prototype:
+
+- [Object.create(proto, [descriptors])](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) – creates an empty object with given `proto` as `[[Prototype]]` and optional property descriptors.
+- [Object.getPrototypeOf(obj)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf) – returns the `[[Prototype]]` of `obj`.
+- [Object.setPrototypeOf(obj, proto)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf) – sets the `[[Prototype]]` of `obj` to proto.
+
+```js
+let animal = {
+  eats: true,
+}
+
+// create a new object with animal as a prototype
+let rabbit = Object.create(animal)
+
+alert(rabbit.eats) // true
+
+alert(Object.getPrototypeOf(rabbit) === animal) // true
+
+Object.setPrototypeOf(rabbit, {}) // change the prototype of rabbit to {
+```
+
+`Object.create` has an optional second argument: property descriptors.
+
+```js
+let animal = {
+  eats: true,
+}
+
+let rabbit = Object.create(animal, {
+  jumps: {
+    value: true,
+  },
+})
+
+alert(rabbit.jumps) // true
+```
+
+### **Very plain objects**
+
+```js
+let obj = {}
+
+let key = prompt("What's the key?", "__proto__")
+obj[key] = "some value"
+
+alert(obj[key]) // [object Object], not "some value"!
+```
+
+![obj [[Prototype]] points to Object.prototype](8-protoypes-inheritance/prototype-methods/obj-has-prototype.png)
+
+```js
+let obj = Object.create(null)
+
+let key = prompt("What's the key?", "__proto__")
+obj[key] = "some value"
+
+alert(obj[key]) // "some value"
+```
+
+`Object.create(null)` creates an empty object w/o a prototype
+
+![obj [[Prototype]] points to null](8-protoypes-inheritance/prototype-methods/obj-has-null.png)
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
