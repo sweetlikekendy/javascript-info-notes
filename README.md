@@ -81,9 +81,9 @@ My notes from the [javascript.info](https://javascript.info) website.
       - [**`new Date(datestring)`**](#new-datedatestring)
       - [**`new Date(year, month, date, hours, minutes, seconds, ms)`**](#new-dateyear-month-date-hours-minutes-seconds-ms)
     - [**Access date components**](#access-date-components)
-      - [**`getFullYear()`\*\*](#getfullyear)
-      - [**`getMonth()`\*\*](#getmonth)
-      - [**`getDate()`\*\*](#getdate)
+      - [**`getFullYear()`**](#getfullyear)
+      - [**`getMonth()`**](#getmonth)
+      - [**`getDate()`**](#getdate)
       - [**`getHours()`, `getMinutes()`, `getSeconds()`, `getMilliseconds()`**](#gethours-getminutes-getseconds-getmilliseconds)
       - [**`getDay()`**](#getday)
       - [**`getTime()`**](#gettime)
@@ -92,7 +92,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Date to number, date diff**](#date-to-number-date-diff)
     - [**Date.now()**](#datenow)
     - [**Benchmarking**](#benchmarking)
-    - [**`Date.parse` from a string\*\*](#dateparse-from-a-string)
+    - [**`Date.parse` from a string**](#dateparse-from-a-string)
   - [**JSON methods**](#json-methods)
     - [**`JSON.stringify`**](#jsonstringify)
     - [**Excluding and transforming: replacer**](#excluding-and-transforming-replacer)
@@ -1219,15 +1219,15 @@ alert(date) // 1.01.2011, 02:03:04.567
 
 ### **Access date components**
 
-#### **[`getFullYear()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/**Global_Objects/Date/getFullYear)\*\*
+#### **[`getFullYear()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getFullYear)**
 
 Get the year (4 digits)
 
-#### **[`getMonth()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/**Date/getMonth)\*\*
+#### **[`getMonth()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth)**
 
 Get the month, from 0 to 11.
 
-#### **[`getDate()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/**Date/getDate)\*\*
+#### **[`getDate()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDate)**
 
 Get the day of month, from 1 to 31, the name of the method does look a little bit strange.
 
@@ -1305,7 +1305,7 @@ alert("Total time for diffSubtract: " + time1)
 alert("Total time for diffGetTime: " + time2)
 ```
 
-### **[`Date.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/**Global_ObjectDate/parse) from a string\*\*
+### **[`Date.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_ObjectDate/parse) from a string**
 
 `YYYY-MM-DDTHH:mm:ss.sssZ` returns the timestamp
 
