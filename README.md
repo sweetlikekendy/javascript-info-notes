@@ -44,7 +44,7 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**forEach**](#foreach)
   - [**Searching in array**](#searching-in-array-1)
     - [**`indexOf`/`lastIndexOf` and includes**](#indexoflastindexof-and-includes)
-    - [**`find` and `findIndex`\*\*](#find-and-findindex)
+    - [\*\*`find` and `findIndex`\*\*](#find-and-findindex)
     - [**`filter`**](#filter)
   - [**Transform an array**](#transform-an-array)
     - [**`map`**](#map)
@@ -188,7 +188,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**The value of "this"**](#the-value-of-this)
     - [**for...in loop**](#forin-loop)
   - [**F.prototype**](#fprototype)
-      - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
+    - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
     - [**Default F.prototype, constructor property**](#default-fprototype-constructor-property)
   - [**Native prototypes**](#native-prototypes)
     - [**Object.prototype**](#objectprototype)
@@ -197,8 +197,17 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Changing native prototypes**](#changing-native-prototypes)
     - [**Borrowing from prototypes**](#borrowing-from-prototypes)
     - [**Borrowing from prototypes**](#borrowing-from-prototypes-1)
-  - [**Prototype methods, objects without **proto****](#prototype-methods-objects-without-proto)
+  - [**Prototype methods, objects without **proto\*\*\*\*](#prototype-methods-objects-without-proto)
     - [**Very plain objects**](#very-plain-objects)
+  - [**Class basic syntax**](#class-basic-syntax)
+    - [**The "class" syntax**](#the-class-syntax)
+    - [**What is a class?**](#what-is-a-class)
+    - [**Not just a syntactic sugar**](#not-just-a-syntactic-sugar)
+    - [**Class Expression**](#class-expression)
+    - [**Getters/setters**](#getterssetters)
+    - [**Computer names [...]**](#computer-names-)
+    - [**Class fields**](#class-fields)
+    - [**Making bound methods with class fields**](#making-bound-methods-with-class-fields)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -3224,6 +3233,181 @@ alert(obj[key]) // "some value"
 `Object.create(null)` creates an empty object w/o a prototype
 
 ![obj [[Prototype]] points to null](8-protoypes-inheritance/prototype-methods/obj-has-null.png)
+
+## **[Class basic syntax](https://javascript.info/class)**
+
+### **The "class" syntax**
+
+```js
+class MyClass {
+  // class methods
+  constructor() { ... }
+  method1() { ... }
+  method2() { ... }
+  method3() { ... }
+  ...
+}
+```
+
+How to use:
+
+```js
+class User {
+  constructor(name) {
+    this.name = name
+  }
+
+  sayHi() {
+    alert(this.name)
+  }
+}
+
+// Usage:
+let user = new User("John")
+user.sayHi()
+```
+
+### **What is a class?**
+
+Class is kind of a fn.
+
+```js
+class User {
+  constructor(name) {
+    this.name = name
+  }
+  sayHi() {
+    alert(this.name)
+  }
+}
+alert(typeof User) // function
+```
+
+![Constructor and prototype](9-classes/basic-syntax/constructor-prototype.png)
+
+```js
+class User {
+  constructor(name) {
+    this.name = name
+  }
+  sayHi() {
+    alert(this.name)
+  }
+}
+
+// class is a function
+alert(typeof User) // function
+
+// ...or, more precisely, the constructor method
+alert(User === User.prototype.constructor) // true
+
+// The methods are in User.prototype, e.g:
+alert(User.prototype.sayHi) // the code of the sayHi method
+
+// there are exactly two methods in the prototype
+alert(Object.getOwnPropertyNames(User.prototype)) // constructor, sayHi
+```
+
+### **Not just a syntactic sugar**
+
+1. Fn created by `class` is labelled by a special internal property `[[FunctionKind]]:"classConstructor"`.
+2. Class methods are non-enumerable. Sets `enumerable`flag to `false`.
+3. Classes always use `strict`.
+
+### **Class Expression**
+
+Classes can be defined inside another expression, passed around, returned, assigned, etc.
+
+Class expressions may have a name. If class expression has a name, it's visible inside the class only.
+
+### **Getters/setters**
+
+Just like literal objects, classes may include getters/setters, computed properties etc.
+
+```js
+class User {
+  constructor(name) {
+    // invokes the setter
+    this.name = name
+  }
+
+  get name() {
+    return this._name
+  }
+
+  set name(value) {
+    if (value.length < 4) {
+      alert("Name is too short.")
+      return
+    }
+    this._name = value
+  }
+}
+```
+
+### **Computer names [...]**
+
+```js
+class User {
+  ["say" + "Hi"]() {
+    alert("Hello")
+  }
+}
+```
+
+### **Class fields**
+
+Class fields is a syntax that allows to add any properties.
+
+```js
+class User {
+  name = "John"
+
+  sayHi() {
+    alert(`Hello, ${this.name}!`)
+  }
+}
+
+let user = new User()
+user.sayHi() // Hello, John!
+alert(user.name) // John
+alert(User.prototype.name) // undefined
+```
+
+### **Making bound methods with class fields**
+
+```js
+class Button {
+  constructor(value) {
+    this.value = value
+  }
+
+  click() {
+    alert(this.value)
+  }
+}
+
+let button = new Button("hello")
+
+setTimeout(button.click, 1000) // undefined
+```
+
+Two fixes:
+
+1. Pass a wrapper fn, such as `setTimeout(() => button.click(), 1000)`.
+2. Bind the method to object in the constructor
+
+```js
+class Button {
+  constructor(value) {
+    this.value = value
+  }
+
+  click = () => {
+    alert(this.value)
+  }
+}
+```
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
