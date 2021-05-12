@@ -44,7 +44,7 @@ My notes from the [javascript.info](https://javascript.info) website.
   - [**forEach**](#foreach)
   - [**Searching in array**](#searching-in-array-1)
     - [**`indexOf`/`lastIndexOf` and includes**](#indexoflastindexof-and-includes)
-    - [\*\*`find` and `findIndex`\*\*](#find-and-findindex)
+    - [**`find` and `findIndex`\*\*](#find-and-findindex)
     - [**`filter`**](#filter)
   - [**Transform an array**](#transform-an-array)
     - [**`map`**](#map)
@@ -188,7 +188,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**The value of "this"**](#the-value-of-this)
     - [**for...in loop**](#forin-loop)
   - [**F.prototype**](#fprototype)
-    - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
+      - [**`F.prototype` only used at `new F` time**](#fprototype-only-used-at-new-f-time)
     - [**Default F.prototype, constructor property**](#default-fprototype-constructor-property)
   - [**Native prototypes**](#native-prototypes)
     - [**Object.prototype**](#objectprototype)
@@ -197,7 +197,7 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Changing native prototypes**](#changing-native-prototypes)
     - [**Borrowing from prototypes**](#borrowing-from-prototypes)
     - [**Borrowing from prototypes**](#borrowing-from-prototypes-1)
-  - [**Prototype methods, objects without **proto\*\*\*\*](#prototype-methods-objects-without-proto)
+  - [**Prototype methods, objects without **proto****](#prototype-methods-objects-without-proto)
     - [**Very plain objects**](#very-plain-objects)
   - [**Class basic syntax**](#class-basic-syntax)
     - [**The "class" syntax**](#the-class-syntax)
@@ -208,6 +208,12 @@ My notes from the [javascript.info](https://javascript.info) website.
     - [**Computer names [...]**](#computer-names-)
     - [**Class fields**](#class-fields)
     - [**Making bound methods with class fields**](#making-bound-methods-with-class-fields)
+  - [**Class inheritance**](#class-inheritance)
+    - [**The "extends" keyword**](#the-extends-keyword)
+    - [**Overriding a method**](#overriding-a-method)
+    - [**Overriding constructor**](#overriding-constructor)
+    - [**Overriding class fields: a tricky note**](#overriding-class-fields-a-tricky-note)
+    - [**Super: interals, [[HomeObject]]**](#super-interals-homeobject)
   - [**Error Handling**](#error-handling)
     - [**Try...catch**](#trycatch)
     - [**Error object**](#error-object)
@@ -3408,6 +3414,143 @@ class Button {
   }
 }
 ```
+
+## **[Class inheritance](https://javascript.info/class-inheritance)**
+
+### **The "extends" keyword**
+
+`class Child extends Parent`
+
+```js
+class Animal {
+  constructor(name) {
+    this.speed = 0
+    this.name = name
+  }
+  run(speed) {
+    this.speed = speed
+    alert(`${this.name} runs with speed ${this.speed}.`)
+  }
+  stop() {
+    this.speed = 0
+    alert(`${this.name} stands still.`)
+  }
+}
+
+class Rabbit extends Animal {
+  hide() {
+    alert(`${this.name} hides!`)
+  }
+}
+
+let rabbit = new Rabbit("White Rabbit")
+
+rabbit.run(5) // White Rabbit runs with speed 5.
+rabbit.hide() // White Rabbit hides!
+```
+
+![Rabbit extends Animal example](9-classes/inheritance/rabbit-animal-example.png)
+
+Engine checks from the bottom up.
+
+**Any expression is allowed after `extends`. Ex: `class User extends f("Hello")**
+
+### **Overriding a method**
+
+Override with `"super"` keyword
+
+- `super.method(...)` to call a parent method.
+- `super(...)` to call a parent constructor (inside our constructor only)
+
+```js
+class Animal {
+  constructor(name) {
+    this.speed = 0
+    this.name = name
+  }
+
+  run(speed) {
+    this.speed = speed
+    alert(`${this.name} runs with speed ${this.speed}.`)
+  }
+
+  stop() {
+    this.speed = 0
+    alert(`${this.name} stands still.`)
+  }
+}
+
+class Rabbit extends Animal {
+  hide() {
+    alert(`${this.name} hides!`)
+  }
+
+  stop() {
+    super.stop() // call parent stop
+    this.hide() // and then hide
+  }
+}
+
+let rabbit = new Rabbit("White Rabbit")
+
+rabbit.run(5) // White Rabbit runs with speed 5.
+rabbit.stop() // White Rabbit stands still. White Rabbit hides!
+```
+
+**Arrow functions have no `super`**
+
+### **Overriding constructor**
+
+If a class extends another class and has no `constructor`, then the following "empty" `constructor` is generated:
+
+```js
+class Rabbit extends Animal {
+  // generated for extending classes without own constructors
+  constructor(...args) {
+    super(...args)
+  }
+}
+```
+
+**Constructors in inheriting classes must call `super(...)`, and do it before `this`.**
+
+A derived constructor has a special internal property `[[ConstructorKind]]:"derived"`.
+
+Label affects its behavior with `new`.
+
+- When a reg fn is executed with `new`, it creates an empty object and assigns it to `this`.
+- Derived constructor doesn't do this. It expects the parent constructor to.
+
+```js
+class Animal {
+  constructor(name) {
+    this.speed = 0
+    this.name = name
+  }
+
+  // ...
+}
+
+class Rabbit extends Animal {
+  constructor(name, earLength) {
+    super(name)
+    this.earLength = earLength
+  }
+
+  // ...
+}
+
+// now fine
+let rabbit = new Rabbit("White Rabbit", 10)
+alert(rabbit.name) // White Rabbit
+alert(rabbit.earLength) // 10
+```
+
+### **Overriding class fields: a tricky note**
+
+### **Super: interals, [[HomeObject]]**
+
+Skip for now. Go over if you read js.info again
 
 ## **[Error Handling](https://javascript.info/error-handling)**
 
